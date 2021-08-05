@@ -1,17 +1,20 @@
-import { useEffect } from "react"
-import { useReducer, useState } from "react"
+import { useEffect, useReducer, useState } from "react"
+import { Col, Container, Row } from "react-bootstrap"
 import Map from "../components/LeafletMap"
+import MapPanel from "../components/MapPanel"
+import SamplePanel from "../components/SamplePanel"
+import SettingsPanel from "../components/SettingsPanel"
 import Sidebar from "../components/Sidebar"
-import SplitPanel from "../components/SplitPanel"
-import { EmpiricalFormProvider } from "../context/EmpiricalFormContext"
+import { TriplePanel } from "../components/TriplePanel"
+import { PhenologyContextProvider } from "../context/PhenologyContext"
 import { getCookie } from "../utils/csrfToken"
 
 const initialFilters = {
   "on": true,
   "start": "",
   "end": "",
-  "min": "-1",
-  "max": "1"
+  "min": "",
+  "max": ""
 }
 
 const filterReducer = (state, action) => {
@@ -26,7 +29,6 @@ const initialDataFilters = {
   "name": "COPERNICUS/S1_GRD",
   "cloud": "10",
   "feature": "VH",
-  "composite": "median",
   "ascd": false,
   "desc": true,
   "boundary": "CHITAWAN",
@@ -39,9 +41,24 @@ const dataFilterReducer = (state, action) => {
   return new_state
 }
 
-export function EmpiricalApp() {
+const initialSampleGeoJson = {
+  "type": "FeatureCollection",
+  "features": []
+}
+
+const sampleGeoJsonReducer = (state, action) => {
+  let new_state = JSON.parse(JSON.stringify(state))
+  if (action.type === "addOne") {
+    new_state.features.append(action.payload)
+  }
+  return new_state
+}
+
+export default function PhenologyApp() {
 
   const [csrfToken, setCsrfToken] = useState(null)
+
+  const [editing, setEditing] = useState(false)
 
   const [dataFilters, dataFiltersDispatch] = useReducer(dataFilterReducer, initialDataFilters)
 
@@ -49,23 +66,22 @@ export function EmpiricalApp() {
   const [peakFilters, peakDispatch] = useReducer(filterReducer, initialFilters)
   const [harvestingFilters, harvestingDispatch] = useReducer(filterReducer, initialFilters)
 
+  const [sampleGeoJson, sampleGeoJsonDispatch] = useReducer(initialSampleGeoJson, sampleGeoJsonReducer)
+
   const [map, setMap] = useState(null)
   const [overlays, setOverlays] = useState([])
   const [layerControl, setLayerControl] = useState(null)
 
-
-
   useEffect(() => {
     let csrf = getCookie('csrftoken')
     setCsrfToken(csrf)
-
-    // axios.defaults.baseURL = process.env.PUBLIC_URL
-    // axios.defaults.headers
-
   }, [])
 
   return (
-    <EmpiricalFormProvider value={{
+    <PhenologyContextProvider value={{
+
+      csrfToken: csrfToken,
+
       dataset: {
         filters: dataFilters,
         dispatch: dataFiltersDispatch,
@@ -82,7 +98,7 @@ export function EmpiricalApp() {
         filters: harvestingFilters,
         dispatch: harvestingDispatch,
       },
-      csrfToken: csrfToken,
+
       map: map,
       setMap: setMap,
 
@@ -90,14 +106,28 @@ export function EmpiricalApp() {
       setOverlays: setOverlays,
 
       layerControl: layerControl,
-      setLayerControl: setLayerControl
-    }}>
-      <SplitPanel 
-        leftPanel={<Sidebar />} 
-        rightPanel={<Map setMap={setMap} setLayerControl={setLayerControl}/>} 
-      />
-    </EmpiricalFormProvider>
+      setLayerControl: setLayerControl,
+
+      editing: editing,
+      setEditing: setEditing,
+
+      sampleGeoJson: sampleGeoJson,
+      sampleGeoJsonDispatch: sampleGeoJsonDispatch,
+      
+    }} >
+      <Container fluid className="h-100 p-0" >
+        <Row className="h-100 gx-0">
+          <Col xs={2} >
+            <SettingsPanel />
+          </Col>
+          <Col xs={8} >
+            <MapPanel />
+          </Col>
+          <Col xs={2}>
+            <SamplePanel />
+          </Col>
+        </Row>
+      </Container>
+    </PhenologyContextProvider>
   )
 }
-
-export default EmpiricalApp;
