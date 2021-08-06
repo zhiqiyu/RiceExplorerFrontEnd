@@ -1,18 +1,17 @@
 import { useContext } from "react"
-import PhenologyContext from "../context/PhenologyContext"
 import Map from "./LeafletMap"
-
+import { useDispatch, useSelector } from "react-redux"
 
 export default function MapPanel(props) {
 
-  const ctx = useContext(PhenologyContext)
+  const { showEditControl } = props
 
-  
+  const sampleGeoJson = useSelector(state => state.samples)
 
   return (
     <div className="w-100 h-100 d-flex flex-column">
       <div className="map-container">
-        <Map setMap={ctx.setMap} setLayerControl={ctx.setLayerControl} />
+        <Map showEditControl={showEditControl}/>
       </div>
       <div className="map-carousel-container">
 

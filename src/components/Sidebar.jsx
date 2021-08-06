@@ -2,25 +2,27 @@ import axios from "axios";
 import _ from "lodash";
 import { useContext, useState } from "react";
 import { Button, Col, Dropdown, DropdownButton, Form, Nav, Row, Spinner, Tab, TabContainer, TabContent, TabPane, Tabs } from "react-bootstrap";
-import EmpiricalFormContext from "../context/EmpiricalFormContext";
-import { SeasonFilterGroup } from "./SeasonFIlterGroup";
+import { SeasonFilterGroup } from "./SeasonFilterGroup";
 import { DataFilterGroup } from "./DataFilterGroup";
 import L from 'leaflet'
 import { filterNames } from '../utils/constants'
 import { useCallback } from "react";
-
+import { map, layerControlRef, addOverlays, removeAllOverlays } from "./LeafletMap"
+import { useDispatch, useSelector } from "react-redux";
 
 const tabNames = {
-  "Datasets": "Datasets",
-  "Filters": "Filters"
+  tab1: "Datasets",
+  tab2: "Filters"
 }
 
 export function Sidebar(props) {
 
-  const ctx = useContext(EmpiricalFormContext)
 
-  let map = ctx.map;
-  // let map = useMap()
+  const csrfToken = useSelector(state => state.csrfToken)
+  const datasetFilters = useSelector(state => state.dataset)
+  const seasonFilters = useSelector(state => state.seasons)
+  const editing = useSelector(state => state.editing)
+  const dispatch = useDispatch()
   
   const [validated, setValidated] = useState(false)
   // const [success, setSuccess] = useState(undefined); // undefined - normal; false - invalid; true - 
@@ -48,17 +50,16 @@ export function Sidebar(props) {
 
     let jsonData = {}
     filterNames.forEach(name => {
-      if (ctx[name].filters['on']) {
-        jsonData[name] = {...ctx[name].filters}
+      if (seasonFilters[name]['on']) {
+        jsonData[name] = _.cloneDeep(seasonFilters[name])
         delete jsonData[name].on
       }
     })
 
-    jsonData['dataset'] = {...ctx['dataset'].filters}
+    jsonData['dataset'] = _.cloneDeep(datasetFilters)
     if (jsonData['dataset'].boundary_file) {
       formData.append('file', jsonData['dataset'].boundary_file)
       delete jsonData['dataset'].boundary_file
-
     } 
 
     formData.append('json', new Blob([JSON.stringify(jsonData)], {
@@ -69,25 +70,25 @@ export function Sidebar(props) {
     axios.post("empirical/", formData, {
       baseURL: process.env.PUBLIC_URL,
       headers: {
-        "X-CSRFToken": ctx.csrfToken,
+        "X-CSRFToken": csrfToken,
       },
       
     }).then(response => {
       let res_body = response.data
-      let layerControl = ctx.layerControl.current
+      let layerControl = layerControlRef.current
 
       // add all new overlays
-      Object.keys(res_body).map(key => {
-        let layer = new L.TileLayer(res_body[key].tile_url).addTo(map)
-        ctx.overlays.push(layer)
-        layerControl.addOverlay(layer, key)
-
-        downloadUrl[key] = res_body[key].download_url
+      let overlays = []
+      Object.keys(res_body).forEach(key => {
+        let layer = new L.TileLayer(res_body[key].tile_url)
+        let overlay = {
+          layer: layer,
+          name: key,
+          url: res_body[key].download_url
+        }
+        overlays.push(overlay)
       })
-      
-      setDownLoadUrl(downloadUrl)
-
-      ctx.setOverlays(ctx.overlays)
+      addOverlays(overlays)
 
       setLoading(false)
 
@@ -100,12 +101,7 @@ export function Sidebar(props) {
     setLoading(true)
 
     // remove all overlays
-    let layerControl = ctx.layerControl.current
-    ctx.overlays.forEach(layer => {
-      layerControl.removeLayer(layer)
-      map.removeLayer(layer)
-    })
-    ctx.setOverlays(ctx.overlays)
+    removeAllOverlays()
   }
 
   const handleExport = (key) => {
@@ -123,27 +119,27 @@ export function Sidebar(props) {
   return (
     <div className="sidebar h-100 flex-column">
       <Form method="POST" onSubmit={handleSubmit} noValidate validated={validated}>
-      <TabContainer defaultActiveKey={tabNames.Datasets} unmountOnExit={false}>
+      <TabContainer defaultActiveKey={tabNames.tab1} unmountOnExit={false}>
         <Row className="tabs-nav g-0">
           <Nav variant="pills" className="h-100">
             <Col className="h-100 align-items-center p-1">
-              <Nav.Link className="tab-title align-middle w-100 h-100 h6" eventKey={tabNames.Datasets} >{tabNames.Datasets}</Nav.Link>
+              <Nav.Link className="tab-title align-middle w-100 h-100 h6" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>
             </Col>
             <Col className="h-100 align-items-center p-1">
-              <Nav.Link className="tab-title align-middle h-100 w-100 h6" eventKey={tabNames.Filters} >{tabNames.Filters}</Nav.Link>
+              <Nav.Link className="tab-title align-middle h-100 w-100 h6" eventKey={tabNames.tab2} >{tabNames.tab2}</Nav.Link>
             </Col>
           </Nav>
         </Row>
         <Row className="tabs-content g-0 p-2">
           <Col>
             <TabContent>
-              <TabPane eventKey={tabNames.Datasets} >
-                <DataFilterGroup filters={ctx.dataset.filters} dispatch={ctx.dataset.dispatch} />
+              <TabPane eventKey={tabNames.tab1} >
+                <DataFilterGroup />
               </TabPane>
-              <TabPane eventKey={tabNames.Filters}>
+              <TabPane eventKey={tabNames.tab2}>
                 
                 {filterNames.map(name => (
-                  <SeasonFilterGroup name={name} key={name} inputThres={true} readOnly={loading} filters={ctx[name].filters} dispatch={ctx[name].dispatch}/>
+                  <SeasonFilterGroup name={name} key={name} inputThres={true} readOnly={loading} />
                 ))}
 
                 <div className="d-grid gap-2">

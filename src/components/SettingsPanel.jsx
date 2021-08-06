@@ -1,11 +1,13 @@
 import { useContext } from "react";
 import { Button, Col, Form, Nav, Row, Spinner, TabContainer, TabContent, TabPane } from "react-bootstrap";
-import PhenologyContext from "../context/PhenologyContext";
 import DataFilterGroup from "./DataFilterGroup";
 import { filterNames } from '../utils/constants'
-import { SeasonFilterGroup } from "./SeasonFIlterGroup";
+import { SeasonFilterGroup } from "./SeasonFilterGroup";
 import { useState } from "react";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import _ from "lodash"
+import { layerControlRef } from "./LeafletMap";
 
 const tabNames = {
   tab1: "Datasets",
@@ -15,7 +17,11 @@ const tabNames = {
 
 export default function SettingsPanel(props) {
 
-  const ctx = useContext(PhenologyContext)
+  const csrfToken = useSelector(state => state.csrfToken)
+  const datasetFilters = useSelector(state => state.dataset)
+  const seasonFilters = useSelector(state => state.seasons)
+  const editing = useSelector(state => state.editing)
+  const dispatch = useDispatch()
 
   const [loading, setLoading] = useState(false)
   const [validated, setValidated] = useState(false)
@@ -37,13 +43,13 @@ export default function SettingsPanel(props) {
 
     let jsonData = {}
     filterNames.forEach(name => {
-      if (ctx[name].filters['on']) {
-        jsonData[name] = {...ctx[name].filters}
+      if (seasonFilters[name]['on']) {
+        jsonData[name] = _.cloneDeep(seasonFilters[name])
         delete jsonData[name].on
       }
     })
 
-    jsonData['dataset'] = {...ctx['dataset'].filters}
+    jsonData['dataset'] = _.cloneDeep(datasetFilters)
     if (jsonData['dataset'].boundary_file) {
       formData.append('file', jsonData['dataset'].boundary_file)
       delete jsonData['dataset'].boundary_file
@@ -57,12 +63,12 @@ export default function SettingsPanel(props) {
     axios.post("phenology/", formData, {
       baseURL: process.env.PUBLIC_URL,
       headers: {
-        "X-CSRFToken": ctx.csrfToken,
+        "X-CSRFToken": csrfToken,
       },
       
     }).then(response => {
       let res_body = response.data
-      let layerControl = ctx.layerControl.current
+      let layerControl = layerControlRef.current
 
       // add all new overlays
       // Object.keys(res_body).map(key => {
@@ -75,8 +81,6 @@ export default function SettingsPanel(props) {
       
       // setDownLoadUrl(downloadUrl)
 
-      ctx.setOverlays(ctx.overlays)
-
       setLoading(false)
 
     }).catch(reason => {
@@ -87,13 +91,6 @@ export default function SettingsPanel(props) {
     // set loading state
     setLoading(true)
 
-    // remove all overlays
-    let layerControl = ctx.layerControl.current
-    ctx.overlays.forEach(layer => {
-      layerControl.removeLayer(layer)
-      ctx.map.removeLayer(layer)
-    })
-    ctx.setOverlays(ctx.overlays)
   }
   
   return (
@@ -115,13 +112,13 @@ export default function SettingsPanel(props) {
             <Col>
               <TabContent>
                 <TabPane eventKey={tabNames.tab1} >
-                  <DataFilterGroup disabled={ctx.editing} filters={ctx.dataset.filters} dispatch={ctx.dataset.dispatch} />
+                  <DataFilterGroup disabled={editing} />
                 </TabPane>
 
                 <TabPane eventKey={tabNames.tab2} >
 
                   {filterNames.map(name => (
-                    <SeasonFilterGroup key={name} name={name} inputThres={false} readOnly={ctx.editing} filters={ctx[name].filters} dispatch={ctx[name].dispatch} />
+                    <SeasonFilterGroup key={name} name={name} inputThres={false} readOnly={editing} />
                   ))}
 
                   <div className="d-grid gap-2">

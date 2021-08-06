@@ -1,48 +1,60 @@
-import { LayersControl, MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { LayersControl, MapContainer, TileLayer, useMap } from "react-leaflet";
 
 import "leaflet/dist/leaflet.css"
 import { useMemo, useRef } from "react";
-// import { useContext } from "react";
-// import EmpiricalFormContext from "../context/EmpiricalFormContext";
 import { useEffect } from "react";
 import _ from "lodash";
+import { useDispatch, useSelector } from "react-redux";
+import { Button } from "react-bootstrap";
+import { useContext } from "react";
+import { BASEMAPS } from "../utils/constants"
+import { toggle } from "../features/phenology/editingSlice"
+
+const defaultBaseMap = "Google Maps"
+
+// global variable to hold Leaflet-related variables and methods
+export let map = null
+export let layerControlRef = null
+export let overlayLayers = []
 
 
-const BASEMAPS = {
-  "Google Maps": {
-    url: "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-    attribution: "Google"
-  },
-  "Google Satellite": {
-    url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-    attribution: "Google"
-  },
-  "Google Terrain": {
-    url: "https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
-    attribution: "Google",
-  },
-  "ESRI World Imagery": {
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-  }
+export const addOverlays = (overlays) => {
+  overlays.forEach(overlay => {
+    overlay.layer.addTo(map)
+    layerControlRef.current.addOverlay(overlay.layer, overlay.name)
+    overlayLayers.push(overlay.layer)
+  })
 }
 
-let defaultBaseMap = "Google Maps"
+// export const replaceOverlays = (overlays) => {
+//   overlayLayers.forEach(layer => {
+//     layerControl.removeLayer(layer)
+//     map.removeLayer(layer)
+//   })
 
+//   overlays = action.payload
+//   return state
+// }
 
+export const removeAllOverlays = (state) => {
+  overlayLayers.forEach(layer => {
+    layerControlRef.current.removeLayer(layer)
+    map.removeLayer(layer)
+  })
+}
 
 export function Map(props) {
 
-  const { setMap, setLayerControl } = props
+  const { showEditControl } = props
 
   const lcRef = useRef()
 
   useEffect(() => {
-    setLayerControl(lcRef)
+    layerControlRef = lcRef
   }, [])
 
   const displayMap = useMemo(() => (
-    <MapContainer center={[28.5973518, 83.54495724]} zoom={8} id="map" whenCreated={setMap}>
+    <MapContainer center={[28.5973518, 83.54495724]} zoom={8} id="map" whenCreated={m => {map = m}}>
       <LayersControl ref={lcRef}>
         {Object.entries(BASEMAPS).map(([name, basemap]) => (
           <LayersControl.BaseLayer name={name} checked={name === defaultBaseMap} key={name}>
@@ -50,10 +62,36 @@ export function Map(props) {
           </LayersControl.BaseLayer>
         ))}
       </LayersControl>
+      
+      {showEditControl ? <EditingControl /> : null}
+      
     </MapContainer>
   ), [])
 
   return displayMap
+}
+
+const EditingControl = (props) => {
+
+  const editing = useSelector(state => state.editing)
+  const dispatch = useDispatch()
+
+  const handleChangeEditing = (e) => {
+    dispatch(toggle())
+  }
+
+  const displayControl = useMemo(
+    () => (
+      <Button variant={editing ? "warning" : "light"} size="sm" onClick={handleChangeEditing}>Start Editing</Button>
+    ),
+    [editing]
+  )
+
+  return (
+    <div className="leaflet-top start-50 top-0">
+      <div className="leaflet-control leaflet-bar">{displayControl}</div>
+    </div>
+  )
 }
 
 

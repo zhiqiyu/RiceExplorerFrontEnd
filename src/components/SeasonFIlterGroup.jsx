@@ -2,26 +2,34 @@ import React from "react";
 import { Card, Col, Form, Row } from "react-bootstrap";
 
 import PropTypes from "prop-types";
-import { useContext } from "react";
-import EmpiricalFormContext from "../context/EmpiricalFormContext";
-import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "../features/phenology/seasonSlice";
 
 
 export const SeasonFilterGroup = (props) => {
-  const { name, inputThres, readOnly, filters, dispatch } = props;
+  const { name, inputThres, readOnly } = props;
+
+  // use state and actions from redux
+  const seasonFilter = useSelector(state => state.seasons[name])
+  const dispatch = useDispatch()
+  const action = actions[name]
 
   // const ctx = useContext(EmpiricalFormContext);
   // let { filters, dispatch } = ctx[name]
 
-  const handleChange = useCallback(
-    (type, value) => {
-      dispatch({
-        type: type,
-        value: value,
-      });
-    },
-    [dispatch]
-  );
+  // const handleChange = useCallback(
+  //   (type, value) => {
+  //     dispatch({
+  //       type: type,
+  //       value: value,
+  //     });
+  //   },
+  //   [dispatch]
+  // );
+
+  const handleChange = (field, value) => {
+    dispatch(action({[field]: value}))
+  }
 
   return (
     <Card className="mb-2 border-secondary">
@@ -31,7 +39,7 @@ export const SeasonFilterGroup = (props) => {
             type="switch"
             id={`${name}_switch`}
             aria-label={name}
-            checked={filters.on}
+            checked={seasonFilter.on}
             onChange={(e) => handleChange("on", e.target.checked)}
           />
         </Col>
@@ -39,7 +47,7 @@ export const SeasonFilterGroup = (props) => {
           <h6 className="m-0">{name.charAt(0).toUpperCase() + name.slice(1)}</h6>
         </Col>
       </Row>
-      <fieldset id={`${name}_fields`} disabled={!filters.on}>
+      <fieldset id={`${name}_fields`} disabled={!seasonFilter.on}>
         <Card.Body>
           <Form.Group
             as={Row}
@@ -55,7 +63,7 @@ export const SeasonFilterGroup = (props) => {
                 required
                 readOnly={readOnly}
                 name={`${name}_start`}
-                value={filters.start}
+                value={seasonFilter.start}
                 onChange={(e) => handleChange("start", e.target.value)}
               />
             </Col>
@@ -74,7 +82,7 @@ export const SeasonFilterGroup = (props) => {
                 required
                 readOnly={readOnly}
                 name={`${name}_end`}
-                value={filters.end}
+                value={seasonFilter.end}
                 onChange={(e) => handleChange("end", e.target.value)}
               />
             </Col>
@@ -99,7 +107,7 @@ export const SeasonFilterGroup = (props) => {
                     placeholder="min"
                     step="0.01"
                     name={`${name}_min`}
-                    value={filters.min}
+                    value={seasonFilter.min}
                     onChange={(e) => handleChange("min", e.target.value)}
                   />
                 </Col>
@@ -113,7 +121,7 @@ export const SeasonFilterGroup = (props) => {
                     placeholder="max"
                     step="0.01"
                     name={`${name}_max`}
-                    value={filters.max}
+                    value={seasonFilter.max}
                     onChange={(e) => handleChange("max", e.target.value)}
                   />
                 </Col>
