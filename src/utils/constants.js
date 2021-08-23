@@ -1,4 +1,4 @@
-export const filterNames = ["sowing", "peak", "harvesting"]
+export const seasonNames = ["sowing", "peak", "harvesting"]
 
 export const districtList = {
   "upload": "Upload boundary file (shp)",

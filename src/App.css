@@ -107,11 +107,16 @@ main {
     overflow-y: auto;
 }
 
-/* .sample-list {
-    overflow-y: auto;
-} */
+.sample-list {
+    font-size: medium;
+}
 
 .chart-canvas {
     /* flex: 1 0 30%; */
-    height: 30vh;
+    height: 28vh;
+}
+
+.popup {
+    max-height: 300px;
+    overflow-y: auto;
 }

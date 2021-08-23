@@ -5,9 +5,9 @@ import { Button, Col, Dropdown, DropdownButton, Form, Nav, Row, Spinner, Tab, Ta
 import { SeasonFilterGroup } from "./SeasonFilterGroup";
 import { DataFilterGroup } from "./DataFilterGroup";
 import L from 'leaflet'
-import { filterNames } from '../utils/constants'
+import { seasonNames } from '../utils/constants'
 import { useCallback } from "react";
-import { map, layerControlRef, addOverlays, removeAllOverlays } from "./LeafletMap"
+import { map, layerControlRef, addTileOverlays, removeAllOverlays } from "./LeafletMap"
 import { useDispatch, useSelector } from "react-redux";
 
 const tabNames = {
@@ -49,7 +49,7 @@ export function Sidebar(props) {
     const formData = new FormData()
 
     let jsonData = {}
-    filterNames.forEach(name => {
+    seasonNames.forEach(name => {
       if (seasonFilters[name]['on']) {
         jsonData[name] = _.cloneDeep(seasonFilters[name])
         delete jsonData[name].on
@@ -88,7 +88,7 @@ export function Sidebar(props) {
         }
         overlays.push(overlay)
       })
-      addOverlays(overlays)
+      addTileOverlays(overlays)
 
       setLoading(false)
 
@@ -138,7 +138,7 @@ export function Sidebar(props) {
               </TabPane>
               <TabPane eventKey={tabNames.tab2}>
                 
-                {filterNames.map(name => (
+                {seasonNames.map(name => (
                   <SeasonFilterGroup name={name} key={name} inputThres={true} readOnly={loading} />
                 ))}
 

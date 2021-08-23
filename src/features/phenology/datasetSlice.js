@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { featureList } from "../../utils/constants";
+import { dataList, featureList } from "../../utils/constants";
 
 const initialDatasetState = {
   name: "COPERNICUS/S1_GRD",
@@ -20,10 +20,10 @@ export const datasetSlice = createSlice({
     changeDataSource: (state, action) => {
       let name = action.payload
       state.name = name
-      if (name in featureList.radar) {
-        state.feature = featureList.radar.VH
-      } else if (name in featureList.optical) {
-        state.feature = featureList.optical.NDVI
+      if (name in dataList.radar) {
+        state.feature = 'VH'
+      } else if (name in dataList.optical) {
+        state.feature = 'NDVI'
         state.cloud = "15"
       }
       return state

@@ -14,19 +14,6 @@ export const SeasonFilterGroup = (props) => {
   const dispatch = useDispatch()
   const action = actions[name]
 
-  // const ctx = useContext(EmpiricalFormContext);
-  // let { filters, dispatch } = ctx[name]
-
-  // const handleChange = useCallback(
-  //   (type, value) => {
-  //     dispatch({
-  //       type: type,
-  //       value: value,
-  //     });
-  //   },
-  //   [dispatch]
-  // );
-
   const handleChange = (field, value) => {
     dispatch(action({[field]: value}))
   }

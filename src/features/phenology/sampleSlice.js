@@ -1,25 +1,38 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialSampleGeoJson = {
-  type: "FeatureCollection",
-  features: [],
+const initialState = {
+  selected: null,
+  geojson: {
+    type: "FeatureCollection",
+    features: [],
+  },
+  results: null
 };
 
 export const sampleSlice = createSlice({
   name: "samples",
-  initialState: initialSampleGeoJson,
+  initialState,
   reducers: {
-    addOne: (state, action) => {
-      state.features.push(action.payload);
-      return state;
+    replace: (state, action) => {
+      state.geojson = action.payload
+      state.selected = null
+      return state
     },
-    addMany: (state, action) => {
-      state.features = state.features.concat(action.payload);
-      return state;
+    addFeatures: (state, action) => {
+      state.geojson.features.push(action.payload)
+      return state
     },
+    selectFeature: (state, action) => {
+      state.selected = state.geojson.features[action.payload]
+    },
+
+    setResult: (state, action) => {
+      state.results = action.payload
+      return state
+    }
   },
 });
 
-export const { addOne, addMany } = sampleSlice.actions;
+export const { replace, addFeatures, selectFeature, setResult } = sampleSlice.actions
 
-export default sampleSlice.reducer;
+export default sampleSlice.reducer

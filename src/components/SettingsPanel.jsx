@@ -1,13 +1,14 @@
 import { useContext } from "react";
 import { Button, Col, Form, Nav, Row, Spinner, TabContainer, TabContent, TabPane } from "react-bootstrap";
 import DataFilterGroup from "./DataFilterGroup";
-import { filterNames } from '../utils/constants'
+import { seasonNames } from '../utils/constants'
 import { SeasonFilterGroup } from "./SeasonFilterGroup";
 import { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import _ from "lodash"
 import { layerControlRef } from "./LeafletMap";
+import { replace, setResult } from "../features/phenology/sampleSlice";
 
 const tabNames = {
   tab1: "Datasets",
@@ -20,6 +21,7 @@ export default function SettingsPanel(props) {
   const csrfToken = useSelector(state => state.csrfToken)
   const datasetFilters = useSelector(state => state.dataset)
   const seasonFilters = useSelector(state => state.seasons)
+  const samples = useSelector(state => state.samples)
   const editing = useSelector(state => state.editing)
   const dispatch = useDispatch()
 
@@ -39,10 +41,10 @@ export default function SettingsPanel(props) {
 
     setValidated(false)
 
-    const formData = new FormData()
+    // const formData = new FormData()
 
     let jsonData = {}
-    filterNames.forEach(name => {
+    seasonNames.forEach(name => {
       if (seasonFilters[name]['on']) {
         jsonData[name] = _.cloneDeep(seasonFilters[name])
         delete jsonData[name].on
@@ -50,17 +52,16 @@ export default function SettingsPanel(props) {
     })
 
     jsonData['dataset'] = _.cloneDeep(datasetFilters)
-    if (jsonData['dataset'].boundary_file) {
-      formData.append('file', jsonData['dataset'].boundary_file)
-      delete jsonData['dataset'].boundary_file
-    } 
+    delete jsonData.dataset.boundary_file
 
-    formData.append('json', new Blob([JSON.stringify(jsonData)], {
-      type: 'application/json'
-    }));
+    jsonData['samples'] = _.cloneDeep(samples.geojson)
 
+    // formData.append('json', new Blob([JSON.stringify(jsonData)], {
+    //   type: 'application/json'
+    // }));
+    console.log(jsonData)
     
-    axios.post("phenology/", formData, {
+    axios.post("phenology/", jsonData, {
       baseURL: process.env.PUBLIC_URL,
       headers: {
         "X-CSRFToken": csrfToken,
@@ -68,8 +69,11 @@ export default function SettingsPanel(props) {
       
     }).then(response => {
       let res_body = response.data
-      let layerControl = layerControlRef.current
+      
+      console.log(res_body)
 
+      dispatch(setResult(res_body))
+      
       // add all new overlays
       // Object.keys(res_body).map(key => {
       //   let layer = new L.TileLayer(res_body[key].tile_url).addTo(map)
@@ -117,7 +121,7 @@ export default function SettingsPanel(props) {
 
                 <TabPane eventKey={tabNames.tab2} >
 
-                  {filterNames.map(name => (
+                  {seasonNames.map(name => (
                     <SeasonFilterGroup key={name} name={name} inputThres={false} readOnly={editing} />
                   ))}
 
