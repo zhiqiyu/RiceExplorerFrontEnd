@@ -23,7 +23,7 @@ export const sampleSlice = createSlice({
       return state
     },
     selectFeature: (state, action) => {
-      state.selected = state.geojson.features[action.payload]
+      state.selected = action.payload
     },
 
     setResult: (state, action) => {

@@ -69,10 +69,8 @@ export default function SettingsPanel(props) {
       
     }).then(response => {
       let res_body = response.data
-      
-      console.log(res_body)
 
-      dispatch(setResult(res_body))
+      dispatch(replace(res_body))
       
       // add all new overlays
       // Object.keys(res_body).map(key => {

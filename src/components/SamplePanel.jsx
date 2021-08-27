@@ -51,42 +51,53 @@ const computeMean = (geojson) => {
   return Object.entries(res)
 }
 
-const prepareChartData = (seasons) => {
-  let chartData = [['date', 'mean']]
-  let combined_data = {}
-  Object.keys(seasons).forEach(season => {
-    let season_res = seasons[season]
-    let features = season_res.features
-    
-    features.forEach(feature => {
-      Object.entries(feature.properties).forEach(([key, val]) => {
-        let words = key.split("_")
-        let date = new Date(Number.parseInt(words[words.length - 2])).getTime()
-        if (date in combined_data) {
-          combined_data[date].push(val)
-        } else {
-          combined_data[date] = []
-        }
-      })
+// const prepareChartData = (seasons) => {
+//   console.log(seasons)
+//   let chartData = [['date', ...Object.keys(seasons)]]
+//   let combined_data = {}
+//   Object.keys(seasons).forEach(season => {
+//     let season_feature = seasons[season]
+//     season_feature.properties.forEach(([key, val]) => {
+//       let words = key.split("_")
+//       let date = new Date(Number.parseInt(words[words.length - 2])).getTime()
+//       combined_data[date] = val
+//     })
+//   }) 
+//   Object.keys(combined_data).sort((a,b)=>Number.parseInt(a)-Number.parseInt(b)).forEach(date => {
+//     chartData.push([new Date(Number.parseInt(date)), combined_data[date]])
+//   })
+//   return chartData
+// }
+
+const prepareChartData = (sample) => {
+  let seasons = {}
+  Object.entries(sample.properties).forEach(([key, val]) => {
+    if (key.endsWith('_feature__')) {
+      let words = key.split('_')
+      let date = new Date(Number.parseInt(words[words.length - 5])).getTime()
+      let season = words[words.length - 4]
+      if (seasons[season]) {
+        seasons[season][date] = val
+      } else {
+        seasons[season] = {}
+      }
+    }
+  })
+  let chartData = [['date', ...Object.keys(seasons)]]
+  Object.keys(seasons).forEach((season, i) => {
+    Object.keys(seasons[season]).sort((a,b)=>Number.parseInt(a)-Number.parseInt(b)).forEach(date => {
+      let row = Array(chartData[0].length).fill(null)
+      row[0] = new Date(Number.parseInt(date))
+      row[i+1] = seasons[season][date]
+      chartData.push(row)
     })
-  }) 
-  Object.keys(combined_data).sort((a,b)=>Number.parseInt(a)-Number.parseInt(b)).forEach(date => {
-    let mean = _.mean(combined_data[date])
-    chartData.push([new Date(Number.parseInt(date)), mean])
   })
   return chartData
-
-  // let data = computeMean(geojson)
-  // let data_modified = data.map(([key, val]) => {
-  //   let words = key.split("_")
-  //   let date = words[words.length - 2]
-  //   return [date, val]
-  // })
-  // return [['date', 'value'], ...data_modified]
-  
 }
 
 let geojsonLayer = null
+
+const idField = "_$id"
 
 export default function SamplePanel() {
   const [invalidFile, setInvalidFile] = useState(true);
@@ -99,24 +110,49 @@ export default function SamplePanel() {
   useEffect(() => {
     if (sampleState.selected) {
       // console.log(sampleState.selected.geometry.coordinates.reverse())
-      let latlon = [...sampleState.selected.geometry.coordinates].reverse()
+      let selected_sample = sampleState.geojson.features.filter(f => f.properties[idField] === sampleState.selected)[0]
+      let latlon = [...selected_sample.geometry.coordinates].reverse()
       panToLatLng(latlon)
       if (geojsonLayer) {
         geojsonLayer.openPopup(latlon)
       }
-    }
-  }, [sampleState.selected])
 
-  useEffect(() => {
-    if (sampleState.results) {
-      let data = prepareChartData(sampleState.results)
-      setChartData(data)
+      // draw chart of the phenology
+      // if (sampleState.results) {
+      //   let seasons = Object.keys(sampleState.results)
+      //   let res_selected = {}
+      //   seasons.forEach(season => {
+      //     res_selected[season] = sampleState.results[season].features.filter(f => {
+
+      //       let coord1 = f.geometry.coordinates.map(v => v.toString())
+      //       let coord2 = sampleState.selected.geometry.coordinates.map(v => v.toString())
+      //       if (coord1[0].slice(0, coord2[0].length) === coord2[0] && coord1[1].slice(0, coord2[0].length) === coord2[1]) {
+      //         return true
+      //       } else {
+      //         return false
+      //       }
+      //     })
+      //     console.log(res_selected[season])
+      //   })
+      //   setChartData(prepareChartData(res_selected))
+      // }
+      setChartData(prepareChartData(selected_sample))
     }
-  }, [sampleState.results])
+  }, [sampleState.selected, sampleState.geojson])
+
+  // useEffect(() => {
+  //   if (sampleState.results) {
+  //     let data = prepareChartData(sampleState.results)
+  //     setChartData(data)
+  //   }
+  // }, [sampleState.results])
 
   const handleUploadFile = async (e) => {
     let file = e.target.files[0];
     let geojson = await shp(await file.arrayBuffer());
+    geojson.features.forEach((feature, i)=> {
+      feature.properties[idField] = i
+    })
     if (geojson.features[0].geometry.type !== "Point") {
     }
     let layer = L.geoJSON(geojson).bindPopup(
@@ -182,10 +218,10 @@ export default function SamplePanel() {
                     action
                     className="px-3 py-1"
                     key={idx}
-                    onClick={() => handleSelectSample(idx)}
-                    active={feature === sampleState.selected}
+                    onClick={() => handleSelectSample(feature.properties[idField])}
+                    active={feature.properties[idField] === sampleState.selected}
                   >
-                    {feature.properties._id}
+                    {feature.properties[idField]}
                   </ListGroup.Item>
                 ))}
             </ListGroup>
@@ -195,7 +231,7 @@ export default function SamplePanel() {
 
       <div className="chart-canvas p-1">
         <div className="w-100 h-100 bg-white">
-        {chartData && 
+        {chartData ?
           <Chart 
             width="100%" 
             height="100%" 
@@ -213,6 +249,8 @@ export default function SamplePanel() {
             }}
             rootProps={{ 'data-testid': '1' }}
           />
+          :
+          "Click on an sample to see its phenology"
         }
         </div>
       </div>
