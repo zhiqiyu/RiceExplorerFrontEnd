@@ -67,8 +67,9 @@ export const panToLatLng = ([lat, lng]) => {
   }
 };
 
+
 export function Map(props) {
-  const { showEditControl } = props;
+  const { showEditControl, info } = props;
 
   const lcRef = useRef();
 
@@ -98,35 +99,14 @@ export function Map(props) {
             </LayersControl.BaseLayer>
           ))}
 
-          {/* geojson layer */}
-          {/* {samples && (
-          <LayersControl.Overlay name="samples">
-            <GeoJSON data={samples}>
-              <Popup>
-                <div className="popup">
-                  <table>
-                    <tr>
-                      <th>key</th>
-                      <th>value</th>
-                    </tr>
-                    {Object.entries(json).map(([key, val]) => (
-                      <tr>
-                        <td>{key}</td>
-                        <td>{val}</td>
-                      </tr>
-                    ))}
-                  </table>
-                </div>
-              </Popup>
-            </GeoJSON>
-          </LayersControl.Overlay> 
-        )} */}
         </LayersControl>
 
         {showEditControl ? <EditingControl /> : null}
+
+        <InfoControl info={info} />
       </MapContainer>
     ),
-    [showEditControl]
+    [showEditControl, info]
   );
 
   return displayMap;
@@ -159,5 +139,24 @@ const EditingControl = (props) => {
     </div>
   );
 };
+
+const InfoControl = (props) => {
+  const { info } = props;
+
+  // const displayControl = useMemo(
+  //   () => (
+      
+  //   ),
+  //   [info]
+  // );
+
+  return (
+    <div className="leaflet-bottom leaflet-left">
+      <div className="leaflet-control leaflet-bar info-board">{info}</div>
+    </div>
+  );
+};
+
+
 
 export default Map;

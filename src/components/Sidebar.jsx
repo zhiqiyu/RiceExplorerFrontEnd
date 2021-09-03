@@ -17,6 +17,7 @@ const tabNames = {
 
 export function Sidebar(props) {
 
+  const { setInfo } = props;
 
   const csrfToken = useSelector(state => state.csrfToken)
   const datasetFilters = useSelector(state => state.dataset)
@@ -75,7 +76,6 @@ export function Sidebar(props) {
       
     }).then(response => {
       let res_body = response.data
-      let layerControl = layerControlRef.current
 
       // add all new overlays
       let overlays = []
@@ -87,6 +87,10 @@ export function Sidebar(props) {
           url: res_body[key].download_url
         }
         overlays.push(overlay)
+
+        if (res_body[key].area) {
+          setInfo("Rice area: " + res_body[key].area + " ha")
+        }
       })
       addTileOverlays(overlays)
 

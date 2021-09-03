@@ -12,6 +12,8 @@ export function EmpiricalApp() {
 
   const dispatch = useDispatch()
 
+  const [info, setInfo] = useState("Please run the app to show area of rice.")
+
   useEffect(() => {
     let token = getCookie('csrftoken')
     dispatch(setToken(token))
@@ -20,8 +22,8 @@ export function EmpiricalApp() {
 
   return (
     <SplitPanel 
-      leftPanel={<Sidebar />} 
-      rightPanel={<Map />} 
+      leftPanel={<Sidebar setInfo={setInfo} />} 
+      rightPanel={<Map info={info} />} 
     />
   )
 }
