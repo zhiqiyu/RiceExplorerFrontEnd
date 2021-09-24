@@ -136,6 +136,7 @@ export default function SamplePanel() {
       //   })
       //   setChartData(prepareChartData(res_selected))
       // }
+      console.log(prepareChartData(selected_sample))
       setChartData(prepareChartData(selected_sample))
     }
   }, [sampleState.selected, sampleState.geojson])

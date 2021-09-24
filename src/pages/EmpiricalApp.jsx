@@ -1,6 +1,7 @@
-import { useEffect } from "react"
+import React, { Fragment, useEffect } from "react"
 import { useReducer, useState } from "react"
 import { useDispatch } from "react-redux"
+import AppStatusBar from "../components/AppStatusBar"
 import Map from "../components/LeafletMap"
 import Sidebar from "../components/Sidebar"
 import SplitPanel from "../components/SplitPanel"
@@ -21,10 +22,14 @@ export function EmpiricalApp() {
 
 
   return (
-    <SplitPanel 
-      leftPanel={<Sidebar setInfo={setInfo} />} 
-      rightPanel={<Map info={info} />} 
-    />
+    <Fragment>
+      <AppStatusBar />
+      <SplitPanel 
+        className="split-panel"
+        leftPanel={<Sidebar setInfo={setInfo} />} 
+        rightPanel={<Map info={info} />} 
+      />
+    </Fragment>
   )
 }
 

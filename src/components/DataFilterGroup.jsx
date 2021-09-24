@@ -72,7 +72,32 @@ export function DataFilterGroup(props) {
             </Form.Group>
           ) : null}
 
-          <Form.Group as={Row} controlId={"dataset_feature"} className="mb-2">
+          <Form.Group as={Row} controlId={"dataset_orbit"} className="mb-2">
+            <Form.Label column xs={4}>
+              Orbit
+            </Form.Label>
+            <Col xs={8}>
+              <Form.Check
+                type="checkbox"
+                id={"desc"}
+                name={"desc"}
+                label="Descending"
+                checked={datasetFilters["desc"]}
+                onChange={(e) => handleChange("desc", e.target.checked)}
+              />
+              <Form.Check
+                type="checkbox"
+                id={"ascd"}
+                name={"ascd"}
+                label="Ascending"
+                checked={datasetFilters["ascd"]}
+                onChange={(e) => handleChange("ascd", e.target.checked)}
+              />
+            </Col>
+          </Form.Group>
+
+
+          <Form.Group as={Row} controlId={"dataset_feature"} className="mb-2 align-items-center">
             <Form.Label column xs={4}>
               Feature
             </Form.Label>
@@ -104,10 +129,10 @@ export function DataFilterGroup(props) {
             <Form.Group
               as={Row}
               controlId={"dataset_composite"}
-              className="mb-2"
+              className="mb-2 align-items-center"
             >
               <Form.Label column xs={4}>
-                Composite
+                Composite Type
               </Form.Label>
               <Col xs={8}>
                 <Form.Select
@@ -126,30 +151,24 @@ export function DataFilterGroup(props) {
             </Form.Group>
           ) : null}
 
-          <Form.Group as={Row} controlId={"dataset_orbit"} className="mb-2">
+          <Form.Group
+            as={Row}
+            controlId={"dataset_composite_days"}
+            className="mb-2 align-items-center"
+          >
             <Form.Label column xs={4}>
-              Orbit
+              Composite Days
             </Form.Label>
             <Col xs={8}>
-              <Form.Check
-                type="checkbox"
-                id={"desc"}
-                name={"desc"}
-                label="Descending"
-                checked={datasetFilters["desc"]}
-                onChange={(e) => handleChange("desc", e.target.checked)}
-              />
-              <Form.Check
-                type="checkbox"
-                id={"ascd"}
-                name={"ascd"}
-                label="Ascending"
-                checked={datasetFilters["ascd"]}
-                onChange={(e) => handleChange("ascd", e.target.checked)}
-              />
+              <Form.Control
+                type="number"
+                onChange={(e) => handleChange("composite_days", e.target.value)}
+                value={datasetFilters["composite_days"]}
+              >
+              </Form.Control>
             </Col>
           </Form.Group>
-
+          
           <Form.Group
             as={Row}
             controlId={"dataset_boundary"}
@@ -176,7 +195,7 @@ export function DataFilterGroup(props) {
             <Form.Group
               as={Row}
               controlId={"dataset_boundary_file"}
-              className="align-items-center"
+              className="align-items-center mb-2"
             >
               <Form.Label column xs={4}>
                 Boundary file <span style={{ color: "red" }}>*</span>
@@ -197,6 +216,24 @@ export function DataFilterGroup(props) {
               </Col>
             </Form.Group>
           ) : null}
+
+          <Form.Group
+            as={Row}
+            controlId={"dataset_cropmask"}
+            className="mb-2 align-items-center"
+          >
+            <Form.Label column xs={4}>
+              Crop Mask (GEE asset)
+            </Form.Label>
+            <Col xs={8}>
+              <Form.Control
+                type={"text"}
+                onChange={(e) => handleChange("crop_mask", e.target.value)}
+                value={datasetFilters["crop_mask"]}
+              />
+            </Col>
+          </Form.Group>
+
         </fieldset>
       </Card.Body>
     </Card>

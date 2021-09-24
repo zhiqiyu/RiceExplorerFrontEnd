@@ -5,7 +5,7 @@ let ismdwn = 0
 
 export function SplitPanel(props) {
 
-  const {leftPanel, rightPanel} = props
+  const {className, leftPanel, rightPanel} = props
 
   const panel1 = useRef()
   const panel2 = useRef()
@@ -31,7 +31,7 @@ export function SplitPanel(props) {
   }
 
   return (
-    <div className="h-100 p-0" style={{"display": "flex"}}>
+    <div className={"h-100 " + className} style={{"display": "flex"}}>
       <div className="left-panel h-100" ref={panel1} children={leftPanel}></div>
 
       <div className="panel-separator" onMouseDown={handleMouseDown}></div>

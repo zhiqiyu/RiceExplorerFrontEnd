@@ -3,6 +3,7 @@
     --left-panel-width: 22%;
     --tabs-nav-height: 40px;
     --map-carousel-height: 200px;
+    --app-status-bar-height: 30px;
 }
 
 /* general style */
@@ -16,6 +17,10 @@ main {
 
 
 /* split panel */
+.split-panel {
+    padding-top: var(--app-status-bar-height);
+}
+
 .left-panel {
     flex-grow: 1;
     flex-shrink: 0;
@@ -93,7 +98,7 @@ main {
 }
 
 .tabs-content {
-    height: calc(100vh - var(--header-height) - var(--tabs-nav-height));
+    height: calc(100vh - var(--header-height) - var(--tabs-nav-height) - var(--app-status-bar-height));
     overflow-y: auto;
 }
 
@@ -126,4 +131,12 @@ main {
     width: 200px;
     height: 100px;
     padding: 8px;
+}
+
+.app-status-bar {
+    width: 100%;
+    justify-content: center;
+    color: white;
+    height: var(--app-status-bar-height);
+    background-color: darkgreen;
 }
