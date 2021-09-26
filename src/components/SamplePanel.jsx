@@ -117,26 +117,7 @@ export default function SamplePanel() {
         geojsonLayer.openPopup(latlon)
       }
 
-      // draw chart of the phenology
-      // if (sampleState.results) {
-      //   let seasons = Object.keys(sampleState.results)
-      //   let res_selected = {}
-      //   seasons.forEach(season => {
-      //     res_selected[season] = sampleState.results[season].features.filter(f => {
-
-      //       let coord1 = f.geometry.coordinates.map(v => v.toString())
-      //       let coord2 = sampleState.selected.geometry.coordinates.map(v => v.toString())
-      //       if (coord1[0].slice(0, coord2[0].length) === coord2[0] && coord1[1].slice(0, coord2[0].length) === coord2[1]) {
-      //         return true
-      //       } else {
-      //         return false
-      //       }
-      //     })
-      //     console.log(res_selected[season])
-      //   })
-      //   setChartData(prepareChartData(res_selected))
-      // }
-      console.log(prepareChartData(selected_sample))
+      
       setChartData(prepareChartData(selected_sample))
     }
   }, [sampleState.selected, sampleState.geojson])

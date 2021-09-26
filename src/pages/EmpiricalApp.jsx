@@ -25,7 +25,7 @@ export function EmpiricalApp() {
     <Fragment>
       <AppStatusBar />
       <SplitPanel 
-        className="split-panel"
+        className="app-main"
         leftPanel={<Sidebar setInfo={setInfo} />} 
         rightPanel={<Map info={info} />} 
       />
