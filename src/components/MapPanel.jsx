@@ -1,6 +1,7 @@
 import { useContext } from "react"
 import Map from "./LeafletMap"
 import { useDispatch, useSelector } from "react-redux"
+import { MapCarousel } from "./MapCarousel"
 
 export default function MapPanel(props) {
 
@@ -14,7 +15,7 @@ export default function MapPanel(props) {
         <Map showEditControl={showEditControl} info={info} />
       </div>
       <div className="map-carousel-container">
-        
+        <MapCarousel />
       </div>
     </div>
   )
