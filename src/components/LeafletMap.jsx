@@ -21,6 +21,8 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import L from "leaflet";
 
+import { idField } from "./panels/SamplePanel"
+
 let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -73,9 +75,21 @@ export function Map(props) {
 
   const lcRef = useRef();
 
+  const sampleState = useSelector(state => state.samples)
+
   useEffect(() => {
     layerControlRef = lcRef;
   }, []);
+
+  useEffect(() => {
+    if (sampleState.selected) {
+
+      let selected_sample = sampleState.geojson.features.filter(f => f.properties[idField] === sampleState.selected)[0]
+      let latlon = [...selected_sample.geometry.coordinates].reverse()
+      panToLatLng(latlon)
+
+    }
+  }, [sampleState.selected])
 
   const displayMap = useMemo(
     () => (

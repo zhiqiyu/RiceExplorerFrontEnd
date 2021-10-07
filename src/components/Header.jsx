@@ -1,5 +1,5 @@
 import { Container, Nav, Navbar } from 'react-bootstrap';
-import { BrowserRouter, Link, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Link, NavLink, Route, Switch } from 'react-router-dom'
 
 export default () => {
   return (
@@ -10,8 +10,8 @@ export default () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link to={"/empirical"} as={Link}>Empirical Thresholding</Nav.Link>
-              <Nav.Link to={"/phenology"} as={Link}>Phenology Explorer</Nav.Link>
+              <Nav.Link to={"/empirical"} as={NavLink}>Empirical Thresholding</Nav.Link>
+              <Nav.Link to={"/phenology"} as={NavLink}>Phenology Explorer</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

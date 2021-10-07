@@ -1,14 +1,14 @@
 import { useContext } from "react";
 import { Button, Col, Form, Nav, Row, Spinner, TabContainer, TabContent, TabPane } from "react-bootstrap";
-import DataFilterGroup from "./DataFilterGroup";
-import { seasonNames } from '../utils/constants'
-import { SeasonFilterGroup } from "./SeasonFilterGroup";
+import { SatelliteDataFilters, AuxDataFilters } from "../DataFilterGroup";
+import { seasonNames } from '../../utils/constants'
+import { SeasonFilterGroup } from "../SeasonFilterGroup";
 import { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import _ from "lodash"
-import { layerControlRef } from "./LeafletMap";
-import { replace, setResult } from "../features/phenology/sampleSlice";
+import { layerControlRef } from "../LeafletMap";
+import { replace, setResult } from "../../features/phenology/sampleSlice";
 
 const tabNames = {
   tab1: "Datasets",
@@ -59,7 +59,6 @@ export default function SettingsPanel(props) {
     // formData.append('json', new Blob([JSON.stringify(jsonData)], {
     //   type: 'application/json'
     // }));
-    console.log(jsonData)
     
     axios.post("phenology/", jsonData, {
       baseURL: process.env.PUBLIC_URL,
@@ -114,7 +113,8 @@ export default function SettingsPanel(props) {
             <Col>
               <TabContent>
                 <TabPane eventKey={tabNames.tab1} >
-                  <DataFilterGroup disabled={editing} />
+                  <SatelliteDataFilters />
+                  {/* <AuxDataFilters /> */}
                 </TabPane>
 
                 <TabPane eventKey={tabNames.tab2} >
@@ -125,12 +125,13 @@ export default function SettingsPanel(props) {
 
                   <div className="d-grid gap-2">
                     <Button type="submit" variant={ loading ? "secondary" : "primary" } disabled={loading}>
-                      {loading ? (
-                        <div>
-                          Running...
-                          <Spinner as="span" animation="border" size="sm" role="status" ></Spinner>
-                        </div> 
-                        ) 
+                      {loading 
+                        ? (
+                          <div>
+                            Running...
+                            <Spinner as="span" animation="border" size="sm" role="status" ></Spinner>
+                          </div> 
+                          ) 
                         : 
                         "Save settings"
                       }

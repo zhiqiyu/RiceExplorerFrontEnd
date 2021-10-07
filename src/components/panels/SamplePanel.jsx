@@ -3,16 +3,17 @@ import ReactDOMServer from "react-dom/server";
 import { Button, ButtonGroup, Card, ListGroup, Table } from "react-bootstrap";
 import shp from "shpjs";
 import L from "leaflet";
-import { map, layerControlRef, addTileOverlays, panToLatLng } from "./LeafletMap";
+import { map, layerControlRef, addTileOverlays, panToLatLng } from "../LeafletMap";
 import { useDispatch, useSelector } from "react-redux";
 import {
   replace,
   addFeatures,
   selectFeature,
-} from "../features/phenology/sampleSlice";
+} from "../../features/phenology/sampleSlice";
 import { useEffect } from "react";
 import Chart from "react-google-charts";
 import _ from 'lodash'
+import { FileEarmarkArrowUpFill, Upload } from "react-bootstrap-icons";
 
 const json2table = (json) => {
   return (
@@ -83,6 +84,11 @@ const prepareChartData = (sample) => {
       }
     }
   })
+
+  if (Object.keys(seasons).length === 0) {
+    return null
+  }
+
   let chartData = [['date', ...Object.keys(seasons)]]
   Object.keys(seasons).forEach((season, i) => {
     Object.keys(seasons[season]).sort((a,b)=>Number.parseInt(a)-Number.parseInt(b)).forEach(date => {
@@ -97,7 +103,7 @@ const prepareChartData = (sample) => {
 
 let geojsonLayer = null
 
-const idField = "_$id"
+export const idField = "_$id"
 
 export default function SamplePanel() {
   const [invalidFile, setInvalidFile] = useState(true);
@@ -111,53 +117,47 @@ export default function SamplePanel() {
     if (sampleState.selected) {
       // console.log(sampleState.selected.geometry.coordinates.reverse())
       let selected_sample = sampleState.geojson.features.filter(f => f.properties[idField] === sampleState.selected)[0]
-      let latlon = [...selected_sample.geometry.coordinates].reverse()
-      panToLatLng(latlon)
-      if (geojsonLayer) {
-        geojsonLayer.openPopup(latlon)
-      }
-
+      // let latlon = [...selected_sample.geometry.coordinates].reverse()
+      // panToLatLng(latlon)
+      // if (geojsonLayer) {
+      //   geojsonLayer.openPopup(latlon)
+      // }
       
       setChartData(prepareChartData(selected_sample))
     }
   }, [sampleState.selected, sampleState.geojson])
 
-  // useEffect(() => {
-  //   if (sampleState.results) {
-  //     let data = prepareChartData(sampleState.results)
-  //     setChartData(data)
-  //   }
-  // }, [sampleState.results])
-
   const handleUploadFile = async (e) => {
-    let file = e.target.files[0];
-    let geojson = await shp(await file.arrayBuffer());
-    geojson.features.forEach((feature, i)=> {
-      feature.properties[idField] = i
-    })
-    if (geojson.features[0].geometry.type !== "Point") {
-    }
-    let layer = L.geoJSON(geojson).bindPopup(
-      (layer) =>
-        ReactDOMServer.renderToString(json2table(layer.feature.properties)),
-      {
-        maxHeight: "300",
-        maxWidth: "400",
+    if (e.target.files && e.target.files.length > 0) {
+      let file = e.target.files[0];
+      let geojson = await shp(await file.arrayBuffer());
+      geojson.features.forEach((feature, i)=> {
+        feature.properties[idField] = i
+      })
+      if (geojson.features[0].geometry.type !== "Point") {
       }
-    );
-    layer.addTo(map);
-    
-    geojsonLayer = layer
+      let layer = L.geoJSON(geojson).bindPopup(
+        (layer) =>
+          ReactDOMServer.renderToString(json2table(layer.feature.properties)),
+        {
+          maxHeight: "300",
+          maxWidth: "400",
+        }
+      );
+      layer.addTo(map);
+      
+      geojsonLayer = layer
 
-    let overlays = [
-      {
-        layer: layer,
-        name: file.name,
-      },
-    ];
-    addTileOverlays(overlays);
+      let overlays = [
+        {
+          layer: layer,
+          name: file.name,
+        },
+      ];
+      addTileOverlays(overlays);
 
-    dispatch(replace(geojson));
+      dispatch(replace(geojson));
+    }
   };
 
   const handleSelectSample = (idx) => {
@@ -166,8 +166,7 @@ export default function SamplePanel() {
 
   return (
     <div className="sidebar h-100 d-flex flex-column">
-      <div className="tabs-nav p-1">
-        {/* <Button variant={ctx.editing ? "warning" : "primary"} size="sm" className="w-100 h-100" onClick={handleChangeEditing}>Start Editing</Button> */}
+      {/* <div className="tabs-nav p-1">
         <Button
           variant="primary"
           size="sm"
@@ -183,14 +182,35 @@ export default function SamplePanel() {
           id="sample-upload"
           onChange={handleUploadFile}
         />
-      </div>
+      </div> */}
 
       <div className="sample-container p-1 ">
         <Card className="h-100">
           <Card.Header>
-            <h6 className="m-0 p-0">
-              Samples { `(count: ${sampleState.geojson.features.length})`}
-            </h6>
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 className="m-0 p-0">
+                  Samples { `(count: ${sampleState.geojson.features.length})`}
+                </h6>
+              </div>
+              <div>
+                <Button
+                  variant="light"
+                  size="sm"
+                  className="h-100 w-100 px-0"
+                  as="label"
+                  htmlFor="sample-upload"
+                >
+                  <FileEarmarkArrowUpFill />
+                </Button>
+                <input
+                  type="file"
+                  className="d-none"
+                  id="sample-upload"
+                  onChange={handleUploadFile}
+                />
+              </div>
+            </div>
           </Card.Header>
           <Card.Body className="p-2">
             <ListGroup className="sample-list">

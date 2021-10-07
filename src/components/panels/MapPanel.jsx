@@ -1,7 +1,7 @@
 import { useContext } from "react"
-import Map from "./LeafletMap"
+import Map from "../LeafletMap"
 import { useDispatch, useSelector } from "react-redux"
-import { MapCarousel } from "./MapCarousel"
+import { MapCarousel } from "../MapCarousel"
 
 export default function MapPanel(props) {
 
