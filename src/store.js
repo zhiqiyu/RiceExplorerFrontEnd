@@ -5,6 +5,7 @@ import sampleReducer from "./features/phenology/sampleSlice";
 import seasonReducer from "./features/phenology/seasonSlice";
 import editingReducer from "./features/phenology/editingSlice";
 import appStatusReducer from "./features/phenology/appStatusSlice";
+import appNameReducer from "./features/phenology/appNameSlice";
 
 export default configureStore({
     reducer: {
@@ -14,5 +15,6 @@ export default configureStore({
         samples: sampleReducer,
         editing: editingReducer,
         appStatus: appStatusReducer,
+        appName: appNameReducer,
     }
 })

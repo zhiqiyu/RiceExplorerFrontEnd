@@ -17,18 +17,17 @@ import { useContext } from "react";
 import { BASEMAPS } from "../utils/constants";
 import { toggle } from "../features/phenology/editingSlice";
 
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import L from "leaflet";
-
 import { idField } from "./panels/SamplePanel"
 
-let DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
-});
+import L from "leaflet";
 
-L.Marker.prototype.options.icon = DefaultIcon;
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
+    iconUrl: require('leaflet/dist/images/marker-icon.png').default,
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png').default
+});
 
 const defaultBaseMap = "Google Maps";
 
@@ -37,6 +36,7 @@ export let map = null;
 export let layerControlRef = null;
 export let tileOverlays = [];
 export let geojsonLayer = null;
+export const setGeojsonLayer = (layer) => geojsonLayer = layer
 
 export const addTileOverlays = (overlays) => {
   overlays.forEach((overlay) => {
@@ -156,20 +156,26 @@ const EditingControl = (props) => {
 
 const InfoControl = (props) => {
   const { info } = props;
-
-  // const displayControl = useMemo(
-  //   () => (
-      
-  //   ),
-  //   [info]
-  // );
-
   return (
     <div className="leaflet-bottom leaflet-left">
-      <div className="leaflet-control leaflet-bar info-board">{info}</div>
+      <div className="leaflet-control leaflet-bar info-board">
+        {info}
+      </div>
     </div>
   );
 };
+
+const ChartControl = (props) => {
+  const { render } = props;
+
+  return (
+    <div className="leaflet-bottom leaflet-left">
+      <div className="leaflet-control leaflet-bar chart-board">
+        {typeof render === 'function' && render()}
+      </div>
+    </div>
+  );
+}
 
 
 

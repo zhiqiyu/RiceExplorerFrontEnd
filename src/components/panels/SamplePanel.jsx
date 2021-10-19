@@ -3,7 +3,7 @@ import ReactDOMServer from "react-dom/server";
 import { Button, ButtonGroup, Card, ListGroup, Table } from "react-bootstrap";
 import shp from "shpjs";
 import L from "leaflet";
-import { map, layerControlRef, addTileOverlays, panToLatLng } from "../LeafletMap";
+import { map, layerControlRef, addTileOverlays, panToLatLng, geojsonLayer, setGeojsonLayer } from "../LeafletMap";
 import { useDispatch, useSelector } from "react-redux";
 import {
   replace,
@@ -12,7 +12,7 @@ import {
 } from "../../features/phenology/sampleSlice";
 import { useEffect } from "react";
 import Chart from "react-google-charts";
-import _ from 'lodash'
+import _, { sample } from 'lodash'
 import { FileEarmarkArrowUpFill, Upload } from "react-bootstrap-icons";
 
 const json2table = (json) => {
@@ -71,37 +71,40 @@ const computeMean = (geojson) => {
 // }
 
 const prepareChartData = (sample) => {
-  let seasons = {}
+  let curve_data = {}
   Object.entries(sample.properties).forEach(([key, val]) => {
-    if (key.endsWith('_feature__')) {
+    if (key.endsWith('_feature')) {
       let words = key.split('_')
-      let date = new Date(Number.parseInt(words[words.length - 5])).getTime()
-      let season = words[words.length - 4]
-      if (seasons[season]) {
-        seasons[season][date] = val
-      } else {
-        seasons[season] = {}
-      }
+      let date = new Date(Number.parseInt(words[words.length - 2])).getTime()
+      curve_data[date] = val
     }
   })
 
-  if (Object.keys(seasons).length === 0) {
+  if (Object.keys(curve_data).length === 0) {
     return null
   }
 
-  let chartData = [['date', ...Object.keys(seasons)]]
-  Object.keys(seasons).forEach((season, i) => {
-    Object.keys(seasons[season]).sort((a,b)=>Number.parseInt(a)-Number.parseInt(b)).forEach(date => {
-      let row = Array(chartData[0].length).fill(null)
-      row[0] = new Date(Number.parseInt(date))
-      row[i+1] = seasons[season][date]
-      chartData.push(row)
-    })
+  let chartData = [['date', 'value']]
+
+  Object.keys(curve_data).sort((a,b)=>Number.parseInt(a)-Number.parseInt(b)).forEach(date => {
+    let row = Array(chartData[0].length).fill(null)
+    row[0] = new Date(Number.parseInt(date))
+    row[1] = curve_data[date]
+    chartData.push(row)
   })
+  
+  // Object.keys(seasons).forEach((season, i) => {
+  //   Object.keys(seasons[season]).sort((a,b)=>Number.parseInt(a)-Number.parseInt(b)).forEach(date => {
+  //     let row = Array(chartData[0].length).fill(null)
+  //     row[0] = new Date(Number.parseInt(date))
+  //     row[i+1] = seasons[season][date]
+  //     chartData.push(row)
+  //   })
+  // })
   return chartData
 }
 
-let geojsonLayer = null
+// let geojsonLayer = null
 
 export const idField = "_$id"
 
@@ -117,11 +120,18 @@ export default function SamplePanel() {
     if (sampleState.selected) {
       // console.log(sampleState.selected.geometry.coordinates.reverse())
       let selected_sample = sampleState.geojson.features.filter(f => f.properties[idField] === sampleState.selected)[0]
-      // let latlon = [...selected_sample.geometry.coordinates].reverse()
-      // panToLatLng(latlon)
-      // if (geojsonLayer) {
-      //   geojsonLayer.openPopup(latlon)
-      // }
+      let latlon = [...selected_sample.geometry.coordinates].reverse()
+      panToLatLng(latlon)
+      if (geojsonLayer) {
+        // geojsonLayer.openPopup(latlon)
+        // let a = L.geoJSON()
+        // a.eachLayer(layer => layer.fea)
+        geojsonLayer.eachLayer(layer => {
+          if (layer.feature.properties[idField] === sampleState.selected) {
+            layer.openPopup(latlon)
+          }
+        })
+      }
       
       setChartData(prepareChartData(selected_sample))
     }
@@ -136,17 +146,48 @@ export default function SamplePanel() {
       })
       if (geojson.features[0].geometry.type !== "Point") {
       }
-      let layer = L.geoJSON(geojson).bindPopup(
-        (layer) =>
-          ReactDOMServer.renderToString(json2table(layer.feature.properties)),
-        {
-          maxHeight: "300",
-          maxWidth: "400",
+
+      // create geojson layer
+      let layer = L.geoJSON(geojson, {
+        pointToLayer: (geoJsonPoint, latlng) => {
+          if (geoJsonPoint.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue) {
+            return L.circleMarker(latlng, {
+              radius: 3, 
+              fillColor: "red", 
+              stroke: 0.2,
+              color: "black",
+              opacity: 0.5,
+              fillOpacity: 1,
+            })
+          } else {
+            return L.circleMarker(latlng, {
+              radius: 3, 
+              fillColor: "blue", 
+              stroke: 0.2,
+              color: "black",
+              opacity: 0.5,
+              fillOpacity: 1
+            })
+          }
+        },
+        onEachFeature: (feature, layer) => {
+          layer.bindPopup(layer => {
+            return ReactDOMServer.renderToString(json2table(layer.feature.properties))
+          }, {
+            maxHeight: "400",
+            maxWidth: "400",
+          })
         }
-      );
+      })
+      // .bindPopup(layer => {
+      //   return ReactDOMServer.renderToString(json2table(layer.feature.properties))
+      // }, {
+      //   maxHeight: "400",
+      //   maxWidth: "400",
+      // })
       layer.addTo(map);
       
-      geojsonLayer = layer
+      setGeojsonLayer(layer)
 
       let overlays = [
         {
@@ -222,8 +263,9 @@ export default function SamplePanel() {
                     key={idx}
                     onClick={() => handleSelectSample(feature.properties[idField])}
                     active={feature.properties[idField] === sampleState.selected}
+                    style={{backgroundColor: feature.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue ? "lightgreen" : null}}
                   >
-                    {feature.properties[idField]}
+                    {`${feature.properties[idField]} - ${feature.properties[sampleState.classProperty.name]}`}
                   </ListGroup.Item>
                 ))}
             </ListGroup>

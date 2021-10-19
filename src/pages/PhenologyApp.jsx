@@ -6,15 +6,19 @@ import SamplePanel from "../components/panels/SamplePanel"
 import SettingsPanel from "../components/panels/SettingsPanel"
 import Sidebar from "../components/Sidebar"
 import { TriplePanel } from "../components/TriplePanel"
-import { getCookie } from "../utils/csrfToken"
-import { setToken } from "../features/phenology/csrfTokenSlice"
 import { useDispatch } from "react-redux"
 import AppStatusBar from "../components/AppStatusBar"
 import { FilterPanel } from "../components/panels/FilterPanel"
+import { useSelector } from "react-redux"
+import { setAppName, APP_NAME } from "../features/phenology/appNameSlice"
 
-const appName = "phenology"
+export default function PhenologyApp() {
 
-export default function PhenologyApp({appName}) {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(setAppName(APP_NAME.phenology))
+  }, [])
 
   return (
     <Fragment>

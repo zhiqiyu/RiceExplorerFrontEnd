@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import _ from "lodash"
 import { layerControlRef } from "../LeafletMap";
 import { replace, setResult } from "../../features/phenology/sampleSlice";
+import { idField } from "./SamplePanel";
+import { useEffect } from "react";
 
 const tabNames = {
   tab1: "Datasets",
@@ -27,6 +29,8 @@ export default function SettingsPanel(props) {
 
   const [loading, setLoading] = useState(false)
   const [validated, setValidated] = useState(false)
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -55,11 +59,8 @@ export default function SettingsPanel(props) {
     delete jsonData.dataset.boundary_file
 
     jsonData['samples'] = _.cloneDeep(samples.geojson)
-
-    // formData.append('json', new Blob([JSON.stringify(jsonData)], {
-    //   type: 'application/json'
-    // }));
     
+    // send request
     axios.post("phenology/", jsonData, {
       baseURL: process.env.PUBLIC_URL,
       headers: {
@@ -69,18 +70,13 @@ export default function SettingsPanel(props) {
     }).then(response => {
       let res_body = response.data
 
-      dispatch(replace(res_body))
-      
-      // add all new overlays
-      // Object.keys(res_body).map(key => {
-      //   let layer = new L.TileLayer(res_body[key].tile_url).addTo(map)
-      //   ctx.overlays.push(layer)
-      //   layerControl.addOverlay(layer, key)
-
-      //   downloadUrl[key] = res_body[key].download_url
-      // })
-      
-      // setDownLoadUrl(downloadUrl)
+      // update the properties of the existing samples
+      let new_samples = _.cloneDeep(samples.geojson)
+      res_body.features.forEach(feature => {
+        let cur_feature = new_samples.features.filter(v => v.properties['_$id'] === feature.properties[idField])[0]
+        cur_feature.properties = feature.properties
+      })
+      dispatch(replace(new_samples))
 
       setLoading(false)
 
@@ -92,6 +88,10 @@ export default function SettingsPanel(props) {
     // set loading state
     setLoading(true)
 
+  }
+
+  const handleRefresh = (e) => {
+    
   }
   
   return (
@@ -137,12 +137,10 @@ export default function SettingsPanel(props) {
                       }
                     </Button>
 
-                    {/* <DropdownButton id="export-dropdown" title="Export" onSelect={(key, e) => handleExport(key)}>
-                      <Dropdown.Item eventKey="season">Export each season</Dropdown.Item>
-                      <Dropdown.Item eventKey="combined">Export combined</Dropdown.Item>
-                    </DropdownButton> */}
-                  </div>
+                    <Button onClick={handleRefresh}>Refresh</Button>
 
+                  </div>
+                  
                 </TabPane>
 
               </TabContent>
@@ -150,7 +148,7 @@ export default function SettingsPanel(props) {
           </Row>
         </TabContainer>
       </Form>
-
+      
     </div>
   )
 }

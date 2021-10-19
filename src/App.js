@@ -11,13 +11,6 @@ import { getCookie } from './utils/csrfToken';
 import { setToken } from './features/phenology/csrfTokenSlice';
 
 
-const APP_NAMES = {
-  empirical: "empirical",
-  phenology: "phenology",
-  classification: "classification",
-}
-
-
 function App() {
 
   const dispatch = useDispatch()
@@ -37,10 +30,10 @@ function App() {
           <Home />
         </Route>
         <Route exact path="/empirical">
-          <EmpiricalApp appName={APP_NAMES.empirical}/>
+          <EmpiricalApp />
         </Route>
         <Route exact path="/phenology">
-          <PhenologyApp appName={APP_NAMES.phenology}/>
+          <PhenologyApp />
         </Route>
       </Switch>
       </main>

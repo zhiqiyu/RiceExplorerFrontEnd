@@ -6,10 +6,9 @@ import Map from "../components/LeafletMap"
 import { FilterPanel } from "../components/panels/FilterPanel"
 import Sidebar from "../components/Sidebar"
 import SplitPanel from "../components/SplitPanel"
+import { APP_NAME, setAppName } from "../features/phenology/appNameSlice"
 import { setToken } from "../features/phenology/csrfTokenSlice"
 import { getCookie } from "../utils/csrfToken"
-
-const appName = "empirical"
 
 export function EmpiricalApp() {
 
@@ -18,8 +17,7 @@ export function EmpiricalApp() {
   const [info, setInfo] = useState("Please run the app to show area of rice.")
 
   useEffect(() => {
-    let token = getCookie('csrftoken')
-    dispatch(setToken(token))
+    dispatch(setAppName(APP_NAME.empirical))
   }, [])
 
 
@@ -28,7 +26,7 @@ export function EmpiricalApp() {
       <AppStatusBar />
       <SplitPanel 
         className="app-main"
-        leftPanel={<FilterPanel setInfo={setInfo} appName={appName} />} 
+        leftPanel={<FilterPanel setInfo={setInfo} />} 
         rightPanel={<Map info={info} />} 
       />
     </Fragment>

@@ -1,9 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const seasons = ["sowing", "peak", "harvesting"];
+export const SEASONS = {
+  sowing: "sowing", 
+  peak: "peak", 
+  harvesting: "harvesting"
+};
 
 const initialState = Object.fromEntries(
-  seasons.map((season) => [
+  Object.keys(SEASONS).map((season) => [
     season,
     {
       on: true,
@@ -16,7 +20,7 @@ const initialState = Object.fromEntries(
 );
 
 const reducers = Object.fromEntries(
-  seasons.map((season) => [
+  Object.keys(SEASONS).map((season) => [
     season,
     (state, action) => {
       state[season] = { ...state[season], ...action.payload }
@@ -25,12 +29,12 @@ const reducers = Object.fromEntries(
   ])
 );
 
-export const seasonSlice = createSlice({
+export const SEASONSlice = createSlice({
   name: "seasons",
   initialState,
   reducers,
 });
 
-export const actions = seasonSlice.actions;
+export const actions = SEASONSlice.actions;
 
-export default seasonSlice.reducer;
+export default SEASONSlice.reducer;

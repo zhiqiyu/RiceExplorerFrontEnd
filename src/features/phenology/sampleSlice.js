@@ -6,7 +6,10 @@ const initialState = {
     type: "FeatureCollection",
     features: [],
   },
-  results: null
+  classProperty: {
+    name: "Cereals",
+    positiveValue: "Rice",
+  }
 };
 
 export const sampleSlice = createSlice({
@@ -25,14 +28,12 @@ export const sampleSlice = createSlice({
     selectFeature: (state, action) => {
       state.selected = action.payload
     },
-
-    setResult: (state, action) => {
-      state.results = action.payload
-      return state
+    setClassProperty: (state, action) => {
+      state.classProperty = action.payload
     }
   },
 });
 
-export const { replace, addFeatures, selectFeature, setResult } = sampleSlice.actions
+export const { replace, addFeatures, selectFeature, setClassProperty } = sampleSlice.actions
 
 export default sampleSlice.reducer

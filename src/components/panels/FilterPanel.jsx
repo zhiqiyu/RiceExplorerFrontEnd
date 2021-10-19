@@ -16,7 +16,7 @@ const tabNames = {
 
 export const FilterPanel = (props) => {
 
-  const { setInfo, appName } = props;
+  const { setInfo } = props;
 
   // state from redux store
   const csrfToken = useSelector(state => state.csrfToken)
@@ -141,7 +141,8 @@ export const FilterPanel = (props) => {
                 <TabPane eventKey={tabNames.tab1} >
                   <fieldset >
                     <SatelliteDataFilters />
-                    {appName === "empirical" && <AuxDataFilters />}
+                    {/* {appName === "empirical" && <AuxDataFilters />} */}
+                    <AuxDataFilters />
                   </fieldset>
                 </TabPane>
                 <TabPane eventKey={tabNames.tab2}>

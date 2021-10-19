@@ -5,14 +5,29 @@ import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../features/phenology/seasonSlice";
 
+import _ from "lodash"
 
 export const SeasonFilterGroup = (props) => {
   const { name, inputThres, readOnly } = props;
 
   // use state and actions from redux
+  const appName = useSelector(state => state.appName)
   const seasonFilter = useSelector(state => state.seasons[name])
+  const sampleState = useSelector(state => state.samples)
   const dispatch = useDispatch()
   const action = actions[name]
+
+  // update thresholds after each re-render
+  // useEffect(() => {
+  //   if (!seasonFilter.on) {
+  //     handleChange("min", null);
+  //     handleChange("max", null);
+  //     return;
+  //   }
+  //   // pre-check if all inputs are valid
+  //   if (sampleState.geojson.features.length === 0) return;
+  //   if (Date.parse(seasonFilter.start))
+  // })
 
   const handleChange = (field, value) => {
     dispatch(action({[field]: value}))
