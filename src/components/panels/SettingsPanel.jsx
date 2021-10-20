@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import { Button, Col, Form, Nav, Row, Spinner, TabContainer, TabContent, TabPane } from "react-bootstrap";
 import { SatelliteDataFilters, AuxDataFilters } from "../DataFilterGroup";
 import { seasonNames } from '../../utils/constants'
@@ -11,19 +10,23 @@ import { layerControlRef } from "../LeafletMap";
 import { replace, setResult } from "../../features/phenology/sampleSlice";
 import { idField } from "./SamplePanel";
 import { useEffect } from "react";
+import { actions } from "../../features/phenology/seasonSlice"
 
 const tabNames = {
   tab1: "Datasets",
   tab2: "Seasons"
 }
 
+const computeThresholds = () => {
+
+}
 
 export default function SettingsPanel(props) {
 
   const csrfToken = useSelector(state => state.csrfToken)
   const datasetFilters = useSelector(state => state.dataset)
   const seasonFilters = useSelector(state => state.seasons)
-  const samples = useSelector(state => state.samples)
+  const sampleState = useSelector(state => state.samples)
   const editing = useSelector(state => state.editing)
   const dispatch = useDispatch()
 
@@ -58,7 +61,7 @@ export default function SettingsPanel(props) {
     jsonData['dataset'] = _.cloneDeep(datasetFilters)
     delete jsonData.dataset.boundary_file
 
-    jsonData['samples'] = _.cloneDeep(samples.geojson)
+    jsonData['samples'] = _.cloneDeep(sampleState.geojson)
     
     // send request
     axios.post("phenology/", jsonData, {
@@ -71,7 +74,7 @@ export default function SettingsPanel(props) {
       let res_body = response.data
 
       // update the properties of the existing samples
-      let new_samples = _.cloneDeep(samples.geojson)
+      let new_samples = _.cloneDeep(sampleState.geojson)
       res_body.features.forEach(feature => {
         let cur_feature = new_samples.features.filter(v => v.properties['_$id'] === feature.properties[idField])[0]
         cur_feature.properties = feature.properties
@@ -91,7 +94,46 @@ export default function SettingsPanel(props) {
   }
 
   const handleRefresh = (e) => {
-    
+    if (sampleState.geojson.features.length === 0) {
+      alert("Please upload the ground truth samples first.")
+      return;
+    }
+
+    Object.keys(seasonFilters).forEach(season => { 
+      let seasonFilter = seasonFilters[season];
+      if (seasonFilter.on) {
+        let start_date = new Date(seasonFilter.start)
+        let end_date = new Date(seasonFilter.end)
+
+        let candidates = []
+
+        sampleState.geojson.features.forEach(sample => {
+          // let candidates = []
+          if (sample.properties[sampleState.classProperty.name] !== sampleState.classProperty.positiveValue) {
+            return;
+          }
+          Object.entries(sample.properties).forEach(([key, val]) => {
+            if (key.endsWith('_feature')) {
+              let words = key.split('_')
+              let date = new Date(Number.parseInt(words[words.length - 2])).getTime()
+              if (start_date.getTime() <= date && date <= end_date.getTime()) {
+                candidates.push(val)
+              }
+            }
+          })
+        })
+
+        if (candidates.length === 0) {
+          return;
+        } 
+
+        // compute mean, std
+        let mean = _.sum(candidates) / candidates.length;
+        let std = Math.sqrt(_.sum(_.map(candidates, v => Math.pow(v - mean, 2)))) / candidates.length;
+        let action = actions[season];
+        dispatch(action({"min": (mean - 3*std).toFixed(2), "max": (mean + 3*std).toFixed(2)}))
+      }
+    })
   }
   
   return (

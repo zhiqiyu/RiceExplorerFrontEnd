@@ -117,7 +117,7 @@ export default function SamplePanel() {
 
   // console.log(sampleState.geojson)
   useEffect(() => {
-    if (sampleState.selected) {
+    if (typeof sampleState.selected === 'number') {
       // console.log(sampleState.selected.geometry.coordinates.reverse())
       let selected_sample = sampleState.geojson.features.filter(f => f.properties[idField] === sampleState.selected)[0]
       let latlon = [...selected_sample.geometry.coordinates].reverse()
