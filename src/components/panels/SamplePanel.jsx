@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import ReactDOMServer from "react-dom/server";
-import { Button, ButtonGroup, Card, ListGroup, Table } from "react-bootstrap";
+import { Button, ButtonGroup, Card, Form, ListGroup, Table } from "react-bootstrap";
 import shp from "shpjs";
 import L from "leaflet";
 import { map, layerControlRef, addTileOverlays, panToLatLng, geojsonLayer, setGeojsonLayer } from "../LeafletMap";
@@ -9,6 +9,7 @@ import {
   replace,
   addFeatures,
   selectFeature,
+  setClassProperty
 } from "../../features/phenology/sampleSlice";
 import { useEffect } from "react";
 import Chart from "react-google-charts";
@@ -205,6 +206,18 @@ export default function SamplePanel() {
     dispatch(selectFeature(idx));
   };
 
+  const handleSelectClassField = (field) => {
+    dispatch(setClassProperty({
+      name: field,
+    }))
+  }
+
+  const handleChangeClassValue = (value) => {
+    dispatch(setClassProperty({
+      positiveValue: value
+    }))
+  }
+
   return (
     <div className="sidebar h-100 d-flex flex-column">
       {/* <div className="tabs-nav p-1">
@@ -254,6 +267,22 @@ export default function SamplePanel() {
             </div>
           </Card.Header>
           <Card.Body className="p-2">
+
+            <div className="d-flex align-items-center ">
+              <div>Class field:</div>
+              <div>
+              <Form.Select onChange={e => handleSelectClassField(e.target.value)}>
+                {sampleState.geojson.features.length !== 0 && Object.keys(sampleState.geojson.features[0].properties).map(k => (
+                  <option key={k}>{k}</option>
+                ))}
+              </Form.Select>
+              </div>
+              <div> = </div>
+              <div> 
+                <Form.Control size="sm" type="text" onChange={e => handleChangeClassValue(e.target.value)}/>
+              </div>
+            </div>
+
             <ListGroup className="sample-list">
               {sampleState.geojson &&
                 sampleState.geojson.features.map((feature, idx) => (

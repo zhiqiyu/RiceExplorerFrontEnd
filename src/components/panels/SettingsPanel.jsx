@@ -139,7 +139,7 @@ export default function SettingsPanel(props) {
         let std = Math.sqrt(_.sum(_.map(filteredCandidates, v => Math.pow(v - mean, 2))) / filteredCandidates.length);
         
         let action = actions[season];
-        dispatch(action({"min": (mean - 2*std).toFixed(2), "max": (mean + 2*std).toFixed(2)}))
+        dispatch(action({"min": (mean - std).toFixed(2), "max": (mean + std).toFixed(2)}))
       }
     })
   }

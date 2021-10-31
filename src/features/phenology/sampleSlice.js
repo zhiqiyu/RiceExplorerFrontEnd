@@ -29,7 +29,7 @@ export const sampleSlice = createSlice({
       state.selected = action.payload
     },
     setClassProperty: (state, action) => {
-      state.classProperty = action.payload
+      state.classProperty = {...state.classProperty, ...action.payload}
     }
   },
 });
