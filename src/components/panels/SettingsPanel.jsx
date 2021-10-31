@@ -6,6 +6,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import _ from "lodash"
+import * as d3 from "d3"
 import { layerControlRef } from "../LeafletMap";
 import { replace, setResult } from "../../features/phenology/sampleSlice";
 import { idField } from "./SamplePanel";
@@ -17,8 +18,13 @@ const tabNames = {
   tab2: "Seasons"
 }
 
-const computeThresholds = () => {
-
+const removeOutliers = (arr) => {
+  let first = d3.quantile(arr, 0.25)
+  let third = d3.quantile(arr, 0.75)
+  let interquatile = third - first
+  let upperbound = third + interquatile * 1.5
+  let lowerbound = first - interquatile * 1.5
+  return arr.filter(element => element > lowerbound && element < upperbound)
 }
 
 export default function SettingsPanel(props) {
@@ -128,10 +134,12 @@ export default function SettingsPanel(props) {
         } 
 
         // compute mean, std
-        let mean = _.sum(candidates) / candidates.length;
-        let std = Math.sqrt(_.sum(_.map(candidates, v => Math.pow(v - mean, 2)))) / candidates.length;
+        let filteredCandidates = removeOutliers(candidates)
+        let mean = _.sum(filteredCandidates) / filteredCandidates.length;
+        let std = Math.sqrt(_.sum(_.map(filteredCandidates, v => Math.pow(v - mean, 2))) / filteredCandidates.length);
+        
         let action = actions[season];
-        dispatch(action({"min": (mean - 3*std).toFixed(2), "max": (mean + 3*std).toFixed(2)}))
+        dispatch(action({"min": (mean - 2*std).toFixed(2), "max": (mean + 2*std).toFixed(2)}))
       }
     })
   }
