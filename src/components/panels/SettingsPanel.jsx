@@ -82,7 +82,7 @@ export default function SettingsPanel(props) {
       // update the properties of the existing samples
       let new_samples = _.cloneDeep(sampleState.geojson)
       res_body.features.forEach(feature => {
-        let cur_feature = new_samples.features.filter(v => v.properties['_$id'] === feature.properties[idField])[0]
+        let cur_feature = new_samples.features.filter(v => v.properties[idField] === feature.properties[idField])[0]
         cur_feature.properties = feature.properties
       })
       dispatch(replace(new_samples))
