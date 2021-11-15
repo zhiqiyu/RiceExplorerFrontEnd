@@ -7,8 +7,8 @@ const initialState = {
     features: [],
   },
   classProperty: {
-    name: "Cereals",
-    positiveValue: "Rice",
+    name: null,
+    positiveValue: null,
   }
 };
 

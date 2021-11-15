@@ -83,7 +83,7 @@ export const MapCarousel = (props) => {
       {Object.keys(smallMapObjs).map(month => (
         <div className="p-1 d-flex flex-column" style={{width:250, flex: "0 0 auto"}}>
           <div>{month}</div>
-          <SmallMap point={selectedSample && [...selectedSample.geometry.coordinates].reverse()}/>
+          <SmallMap point={selectedSample && [...selectedSample.geometry.coordinates].reverse()} month={month}/>
         </div>
       ))}
     </div>

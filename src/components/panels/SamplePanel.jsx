@@ -35,42 +35,6 @@ const json2table = (json) => {
   );
 };
 
-const computeMean = (geojson) => {
-  let features = geojson.features
-  let res = {}
-  features.forEach(feature => {
-    Object.keys(feature.properties).forEach(key => {
-      if (key in res) {
-        res[key].push(feature.properties[key])
-      } else {
-        res[key] = []
-      }
-    })
-  })
-  Object.keys(res).forEach(key => {
-    res[key] = _.mean(res[key])
-  })
-  return Object.entries(res)
-}
-
-// const prepareChartData = (seasons) => {
-//   console.log(seasons)
-//   let chartData = [['date', ...Object.keys(seasons)]]
-//   let combined_data = {}
-//   Object.keys(seasons).forEach(season => {
-//     let season_feature = seasons[season]
-//     season_feature.properties.forEach(([key, val]) => {
-//       let words = key.split("_")
-//       let date = new Date(Number.parseInt(words[words.length - 2])).getTime()
-//       combined_data[date] = val
-//     })
-//   }) 
-//   Object.keys(combined_data).sort((a,b)=>Number.parseInt(a)-Number.parseInt(b)).forEach(date => {
-//     chartData.push([new Date(Number.parseInt(date)), combined_data[date]])
-//   })
-//   return chartData
-// }
-
 const prepareChartData = (sample) => {
   let curve_data = {}
   Object.entries(sample.properties).forEach(([key, val]) => {
@@ -111,7 +75,10 @@ export const idField = "_$id"
 
 export default function SamplePanel() {
   const [invalidFile, setInvalidFile] = useState(true);
-  const [chartData, setChartData] = useState(null)
+  const [chartData, setChartData] = useState(null);
+
+  const [fieldState, setFieldState] = useState(null);
+  const [positiveValueState, setPositiveValueState] = useState(null);
 
   const sampleState = useSelector((state) => state.samples);
   const dispatch = useDispatch();
@@ -138,6 +105,56 @@ export default function SamplePanel() {
     }
   }, [sampleState.selected, sampleState.geojson])
 
+  useEffect(() => {
+    if (sampleState.classProperty.name === null) return;
+
+    geojsonLayer.eachLayer(layer => {
+      let geoJsonPoint = layer.feature;
+      if (geoJsonPoint.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue) {
+        layer.setStyle({
+          radius: 3, 
+          fillColor: "red", 
+          stroke: 0.2,
+          color: "black",
+          opacity: 0.5,
+          fillOpacity: 1,
+        })
+      } else {
+        layer.setStyle({
+          radius: 3, 
+          fillColor: "blue", 
+          stroke: 0.2,
+          color: "black",
+          opacity: 0.5,
+          fillOpacity: 1
+        })
+      }
+    })
+
+  }, [sampleState.classProperty])
+
+  const setGeoJsonStyle = (geoJsonPoint, latlng) => {
+    if (geoJsonPoint.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue) {
+      return L.circleMarker(latlng, {
+        radius: 3, 
+        fillColor: "red", 
+        stroke: 0.2,
+        color: "black",
+        opacity: 0.5,
+        fillOpacity: 1,
+      })
+    } else {
+      return L.circleMarker(latlng, {
+        radius: 3, 
+        fillColor: "blue", 
+        stroke: 0.2,
+        color: "black",
+        opacity: 0.5,
+        fillOpacity: 1
+      })
+    }
+  }
+
   const handleUploadFile = async (e) => {
     if (e.target.files && e.target.files.length > 0) {
       let file = e.target.files[0];
@@ -145,8 +162,9 @@ export default function SamplePanel() {
       geojson.features.forEach((feature, i)=> {
         feature.properties[idField] = i
       })
-      if (geojson.features[0].geometry.type !== "Point") {
-      }
+
+      // if (geojson.features[0].geometry.type !== "Point") {
+      // }
 
       // create geojson layer
       let layer = L.geoJSON(geojson, {
@@ -180,12 +198,6 @@ export default function SamplePanel() {
           })
         }
       })
-      // .bindPopup(layer => {
-      //   return ReactDOMServer.renderToString(json2table(layer.feature.properties))
-      // }, {
-      //   maxHeight: "400",
-      //   maxWidth: "400",
-      // })
       layer.addTo(map);
       
       setGeojsonLayer(layer)
@@ -218,25 +230,17 @@ export default function SamplePanel() {
     }))
   }
 
+  const handleSaveClassProperty = (e) => {
+    e.preventDefault()
+
+    dispatch(setClassProperty({
+      name: fieldState,
+      positiveValue: positiveValueState,
+    }))
+  }
+
   return (
     <div className="sidebar h-100 d-flex flex-column">
-      {/* <div className="tabs-nav p-1">
-        <Button
-          variant="primary"
-          size="sm"
-          className="h-100 w-100"
-          as="label"
-          htmlFor="sample-upload"
-        >
-          Upload Sample
-        </Button>
-        <input
-          type="file"
-          className="d-none"
-          id="sample-upload"
-          onChange={handleUploadFile}
-        />
-      </div> */}
 
       <div className="sample-container p-1 ">
         <Card className="h-100">
@@ -269,18 +273,38 @@ export default function SamplePanel() {
           <Card.Body className="p-2">
 
             <div className="d-flex align-items-center ">
+              <Form onSubmit={handleSaveClassProperty}>
               <div>Class field:</div>
               <div>
-              <Form.Select onChange={e => handleSelectClassField(e.target.value)}>
-                {sampleState.geojson.features.length !== 0 && Object.keys(sampleState.geojson.features[0].properties).map(k => (
-                  <option key={k}>{k}</option>
-                ))}
-              </Form.Select>
+                <Form.Select 
+                  value={fieldState}
+                  onChange={e => setFieldState(e.target.value)}
+                >
+                  {sampleState.geojson.features.length !== 0 && Object.keys(sampleState.geojson.features[0].properties).map(k => (
+                    <option key={k}>{k}</option>
+                  ))}
+                </Form.Select>
               </div>
               <div> = </div>
               <div> 
-                <Form.Control size="sm" type="text" onChange={e => handleChangeClassValue(e.target.value)}/>
+                <Form.Control 
+                  size="sm" 
+                  type="text" 
+                  value={positiveValueState}
+                  onChange={e => setPositiveValueState(e.target.value)}
+                />
+                <Form.Select 
+                  value={positiveValueState}
+                  onChange={e => setPositiveValueState(e.target.value)}
+                >
+                  {sampleState.geojson.features.length !== 0 && [...new Set(sampleState.geojson.features.map(feature => feature.properties[sampleState.classProperty.name]))].map(v => (
+                    <option key={v}>{v}</option>
+                  ))
+                  }
+                </Form.Select>
               </div>
+              <div><Button type="submit" >Save</Button></div>
+              </Form>
             </div>
 
             <ListGroup className="sample-list">
