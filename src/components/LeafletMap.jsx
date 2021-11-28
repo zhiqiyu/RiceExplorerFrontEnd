@@ -71,7 +71,7 @@ export const panToLatLng = ([lat, lng]) => {
 
 
 export function Map(props) {
-  const { showEditControl, info } = props;
+  const { showEditControl, showInfoControl, info } = props;
 
   const lcRef = useRef();
 
@@ -117,7 +117,7 @@ export function Map(props) {
 
         {showEditControl ? <EditingControl /> : null}
 
-        <InfoControl info={info} />
+        {showInfoControl ? <InfoControl info={info} /> : null}
       </MapContainer>
     ),
     [showEditControl, info]

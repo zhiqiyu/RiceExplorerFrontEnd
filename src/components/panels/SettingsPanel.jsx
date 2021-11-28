@@ -57,17 +57,28 @@ export default function SettingsPanel(props) {
     // const formData = new FormData()
 
     let jsonData = {}
-    seasonNames.forEach(name => {
-      if (seasonFilters[name]['on']) {
-        jsonData[name] = _.cloneDeep(seasonFilters[name])
-        delete jsonData[name].on
-      }
-    })
+    // seasonNames.forEach(name => {
+    //   if (seasonFilters[name]['on']) {
+    //     jsonData[name] = _.cloneDeep(seasonFilters[name])
+    //     delete jsonData[name].on
+    //   }
+    // })
 
     jsonData['dataset'] = _.cloneDeep(datasetFilters)
     delete jsonData.dataset.boundary_file
 
-    jsonData['samples'] = _.cloneDeep(sampleState.geojson)
+    let samples = _.cloneDeep(sampleState.geojson)
+
+    // get rid of existing phenology info
+    samples.features.forEach(feature => {
+      Object.keys(feature.properties).forEach(key => {
+        if (key.endsWith('_feature')) {
+          delete feature.properties[key]
+        }
+      })
+    })
+
+    jsonData['samples'] = samples
     
     // send request
     axios.post("phenology/", jsonData, {
@@ -80,12 +91,12 @@ export default function SettingsPanel(props) {
       let res_body = response.data
 
       // update the properties of the existing samples
-      let new_samples = _.cloneDeep(sampleState.geojson)
+      // let new_samples = samples
       res_body.features.forEach(feature => {
-        let cur_feature = new_samples.features.filter(v => v.properties[idField] === feature.properties[idField])[0]
+        let cur_feature = samples.features.filter(v => v.properties[idField] === feature.properties[idField])[0]
         cur_feature.properties = feature.properties
       })
-      dispatch(replace(new_samples))
+      dispatch(replace(samples))
 
       setLoading(false)
 
@@ -146,7 +157,7 @@ export default function SettingsPanel(props) {
   
   return (
     <div className="sidebar h-100 flex-column">
-      <Form method="POST" noValidate validated={validated} onSubmit={handleSubmit}>
+      
         <TabContainer defaultActiveKey={tabNames.tab1} unmountOnExit={false}>
           <Row className="tabs-nav g-0">
             <Nav variant="pills" className="h-100">
@@ -163,18 +174,11 @@ export default function SettingsPanel(props) {
             <Col>
               <TabContent>
                 <TabPane eventKey={tabNames.tab1} >
+                  <Form method="POST" noValidate validated={validated} onSubmit={handleSubmit}>
                   <SatelliteDataFilters />
                   {/* <AuxDataFilters /> */}
-                </TabPane>
-
-                <TabPane eventKey={tabNames.tab2} >
-
-                  {seasonNames.map(name => (
-                    <SeasonFilterGroup key={name} name={name} inputThres={false} readOnly={editing} />
-                  ))}
-
-                  <div className="d-grid gap-2">
-                    <Button type="submit" variant={ loading ? "secondary" : "primary" } disabled={loading}>
+                  
+                    <Button className="w-100" type="submit" variant={ loading ? "secondary" : "primary" } disabled={loading}>
                       {loading 
                         ? (
                           <div>
@@ -186,10 +190,16 @@ export default function SettingsPanel(props) {
                         "Save settings"
                       }
                     </Button>
+                  </Form>
+                </TabPane>
 
-                    <Button onClick={handleRefresh}>Refresh</Button>
+                <TabPane eventKey={tabNames.tab2} >
 
-                  </div>
+                  {seasonNames.map(name => (
+                    <SeasonFilterGroup key={name} name={name} inputThres={false} readOnly={editing} />
+                  ))}
+
+                  <Button className="w-100" onClick={handleRefresh} >Refresh</Button>
                   
                 </TabPane>
 
@@ -197,7 +207,7 @@ export default function SettingsPanel(props) {
             </Col>
           </Row>
         </TabContainer>
-      </Form>
+      
       
     </div>
   )

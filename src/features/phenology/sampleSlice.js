@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { idField } from "../../components/panels/SamplePanel";
 
 const initialState = {
   selected: null,
@@ -25,6 +26,12 @@ export const sampleSlice = createSlice({
       state.geojson.features.push(action.payload)
       return state
     },
+    deleteFeature: (state, action) => {
+      let idx = state.geojson.features.findIndex((value, index) => {
+        return value.properties[idField] === action.payload
+      })
+      state.geojson.features.splice(idx, 1)
+    },
     selectFeature: (state, action) => {
       state.selected = action.payload
     },
@@ -34,6 +41,6 @@ export const sampleSlice = createSlice({
   },
 });
 
-export const { replace, addFeatures, selectFeature, setClassProperty } = sampleSlice.actions
+export const { replace, addFeatures, deleteFeature, selectFeature, setClassProperty } = sampleSlice.actions
 
 export default sampleSlice.reducer

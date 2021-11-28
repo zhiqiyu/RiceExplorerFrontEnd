@@ -9,12 +9,13 @@ import {
   replace,
   addFeatures,
   selectFeature,
-  setClassProperty
+  setClassProperty,
+  deleteFeature
 } from "../../features/phenology/sampleSlice";
 import { useEffect } from "react";
 import Chart from "react-google-charts";
 import _, { sample } from 'lodash'
-import { FileEarmarkArrowUpFill, Upload } from "react-bootstrap-icons";
+import { FileEarmarkArrowUpFill, TrashFill, Upload } from "react-bootstrap-icons";
 
 const json2table = (json) => {
   return (
@@ -160,7 +161,7 @@ export default function SamplePanel() {
       let file = e.target.files[0];
       let geojson = await shp(await file.arrayBuffer());
       geojson.features.forEach((feature, i)=> {
-        feature.properties[idField] = i
+        feature.properties[idField] = i+1
       })
 
       // if (geojson.features[0].geometry.type !== "Point") {
@@ -221,6 +222,7 @@ export default function SamplePanel() {
   const handleSelectClassField = (field) => {
     dispatch(setClassProperty({
       name: field,
+      positiveValue: null,
     }))
   }
 
@@ -242,7 +244,7 @@ export default function SamplePanel() {
   return (
     <div className="sidebar h-100 d-flex flex-column">
 
-      <div className="sample-container p-1 ">
+      <div className="sample-container px-2 pt-2">
         <Card className="h-100">
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
@@ -271,67 +273,75 @@ export default function SamplePanel() {
             </div>
           </Card.Header>
           <Card.Body className="p-2">
-
-            <div className="d-flex align-items-center ">
-              <Form onSubmit={handleSaveClassProperty}>
-              <div>Class field:</div>
-              <div>
-                <Form.Select 
-                  value={fieldState}
-                  onChange={e => setFieldState(e.target.value)}
-                >
-                  {sampleState.geojson.features.length !== 0 && Object.keys(sampleState.geojson.features[0].properties).map(k => (
-                    <option key={k}>{k}</option>
-                  ))}
-                </Form.Select>
+            <div className="container card mb-2">
+              <div className="p-2">
+                <div className="row align-items-center mb-2">
+                  {/* <Form onSubmit={handleSaveClassProperty}> */}
+                  <div className="col-auto">Class field:</div>
+                  <div className="col">
+                    <Form.Select 
+                      className="w-100"
+                      value={sampleState.classProperty.name}
+                      onChange={e => handleSelectClassField(e.target.value)}
+                    >
+                      {sampleState.geojson.features.length !== 0 && Object.keys(sampleState.geojson.features[0].properties).map(k => (
+                        <option key={k}>{k}</option>
+                      ))}
+                    </Form.Select>
+                  </div>
+                </div>
+                <div className="row align-items-center">
+                  <div className="col-auto">Class value:</div>
+                  <div className="col"> 
+                    {/* <Form.Control 
+                      size="sm" 
+                      type="text" 
+                      value={positiveValueState}
+                      onChange={e => setPositiveValueState(e.target.value)}
+                    /> */}
+                    <Form.Select 
+                      value={sampleState.classProperty.positiveValue}
+                      onChange={e => handleChangeClassValue(e.target.value)}
+                    >
+                      <option selected></option>
+                      {sampleState.geojson.features.length !== 0 && [...new Set(sampleState.geojson.features.map(feature => feature.properties[sampleState.classProperty.name]))].map(v => {
+                        return (<option key={v}>{v}</option>)
+                      })
+                      }
+                    </Form.Select>
+                  </div>
+                  {/* <div><Button type="submit" >Save</Button></div>
+                  </Form> */}
+                </div>
               </div>
-              <div> = </div>
-              <div> 
-                <Form.Control 
-                  size="sm" 
-                  type="text" 
-                  value={positiveValueState}
-                  onChange={e => setPositiveValueState(e.target.value)}
-                />
-                <Form.Select 
-                  value={positiveValueState}
-                  onChange={e => setPositiveValueState(e.target.value)}
-                >
-                  {sampleState.geojson.features.length !== 0 && [...new Set(sampleState.geojson.features.map(feature => feature.properties[sampleState.classProperty.name]))].map(v => (
-                    <option key={v}>{v}</option>
-                  ))
-                  }
-                </Form.Select>
-              </div>
-              <div><Button type="submit" >Save</Button></div>
-              </Form>
             </div>
 
             <ListGroup className="sample-list">
               {sampleState.geojson &&
                 sampleState.geojson.features.map((feature, idx) => (
-                  <ListGroup.Item
-                    action
-                    className="px-3 py-1"
-                    key={idx}
-                    onClick={() => handleSelectSample(feature.properties[idField])}
-                    active={feature.properties[idField] === sampleState.selected}
-                    style={{backgroundColor: feature.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue ? "lightgreen" : null}}
-                  >
-                    {`${feature.properties[idField]} - ${feature.properties[sampleState.classProperty.name]}`}
-                  </ListGroup.Item>
+                  <SampleItem feature={feature} idx={idx} />
+                  // <ListGroup.Item
+                  //   action
+                  //   className="px-3 py-1"
+                  //   key={idx}
+                  //   onClick={() => handleSelectSample(feature.properties[idField])}
+                  //   active={feature.properties[idField] === sampleState.selected}
+                  //   style={{backgroundColor: feature.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue ? "lightgreen" : null}}
+                  // >
+                  //   {`${feature.properties[idField]} - ${feature.properties[sampleState.classProperty.name]}`}
+                  // </ListGroup.Item>
                 ))}
             </ListGroup>
           </Card.Body>
         </Card>
       </div>
 
-      <div className="chart-canvas p-1">
+      <div className="chart-canvas p-2">
         <div className="w-100 h-100 bg-white">
         {chartData ?
           <Chart 
             width="100%" 
-            height="100%" 
+            height="90%" 
             chartType="LineChart" 
             loader={<div>Loading Chart...</div>} 
             data={chartData}
@@ -343,6 +353,9 @@ export default function SamplePanel() {
               vAxis: {
                 title: 'Value',
               },
+              legend: {
+                position: 'bottom'
+              },
             }}
             rootProps={{ 'data-testid': '1' }}
           />
@@ -353,4 +366,58 @@ export default function SamplePanel() {
       </div>
     </div>
   );
+}
+
+const SampleItem = (props) => {
+
+  const { idx, feature } = props;
+
+  const sampleState = useSelector(state => state.samples)
+  const dispatch = useDispatch()
+
+  const handleSelectSample = (idx) => {
+    dispatch(selectFeature(idx));
+  };
+
+  const handleDelete = (e, id) => {
+    e.stopPropagation()
+    console.log(id)
+    geojsonLayer.eachLayer(layer => {
+      
+      if (id === layer.feature.properties[idField]) {
+        geojsonLayer.removeLayer(layer)
+      }
+    })
+    dispatch(deleteFeature(id))
+    dispatch(selectFeature(null))
+  }
+
+  return (
+    <ListGroup.Item
+      action
+      className="px-3 py-1"
+      key={idx}
+      onClick={() => handleSelectSample(feature.properties[idField])}
+      active={feature.properties[idField] === sampleState.selected}
+      style={{backgroundColor: feature.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue ? "lightgreen" : null}}
+    >
+      <div className="d-flex align-items-center flex-row justify-content-between">
+        <div>
+          {`${feature.properties[idField]} - ${feature.properties[sampleState.classProperty.name]}`}
+        </div>
+        <div >
+          <Button
+            variant="light"
+            size="sm"
+            className="h-100 w-100 px-0 bg-transparent"
+            as="label"
+            onClick={(e) => handleDelete(e, feature.properties[idField])}
+          >
+            <TrashFill />
+          </Button>
+        </div>
+      </div>
+      
+    </ListGroup.Item>
+  )
 }

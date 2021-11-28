@@ -25,14 +25,14 @@ export default function PhenologyApp() {
       <AppStatusBar />
       <Container fluid className="h-100 app-main pb-0 ps-0 pe-0">
         <Row className="h-100 gx-0">
-          <Col xs={2} >
+          <Col >
             <SettingsPanel />
             {/* <FilterPanel appName={appName} /> */}
           </Col>
-          <Col xs={8} >
-            <MapPanel showEditControl={true} />
+          <Col xs={"7"} >
+            <MapPanel showEditControl={false} showInfoControl={false}/>
           </Col>
-          <Col xs={2}>
+          <Col >
             <SamplePanel />
           </Col>
         </Row>

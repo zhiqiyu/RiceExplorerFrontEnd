@@ -27,7 +27,7 @@ export function EmpiricalApp() {
       <SplitPanel 
         className="app-main"
         leftPanel={<FilterPanel setInfo={setInfo} />} 
-        rightPanel={<Map info={info} />} 
+        rightPanel={<Map showInfoControl={true} info={info} />} 
       />
     </Fragment>
   )

@@ -27,7 +27,7 @@ const smallMapObjs = {
 const SmallMap = (props) => {
 
   const { month, point } = props
-
+  console.log(point)
   return (
     <MapContainer
       center={point || [28.5973518, 83.54495724]}

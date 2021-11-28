@@ -108,7 +108,7 @@ main {
 }
 
 .sample-container {
-    height: calc(70vh - var(--header-height) - var(--tabs-nav-height) - var(--app-status-bar-height));
+    height: calc(75vh - var(--header-height) - var(--tabs-nav-height) - var(--app-status-bar-height));
     /* flex: 0 1 70%; */
     overflow-y: auto;
 }
@@ -122,9 +122,8 @@ main {
 }
 
 .chart-canvas {
-    /* flex: 1 0 30%; */
-    /* height: 28vh; */
-    flex: 1 0 20%;
+    /* height: 20vh; */
+    flex: 1 1 20vh;
 }
 
 .popup {
