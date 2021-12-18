@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from "react"
 import { useReducer, useState } from "react"
 import { useDispatch } from "react-redux"
 import AppStatusBar from "../components/AppStatusBar"
-import Map from "../components/LeafletMap"
+import Map, { geojsonLayer } from "../components/LeafletMap"
 import { FilterPanel } from "../components/panels/FilterPanel"
 import Sidebar from "../components/Sidebar"
 import SplitPanel from "../components/SplitPanel"
@@ -18,6 +18,7 @@ export function EmpiricalApp() {
 
   useEffect(() => {
     dispatch(setAppName(APP_NAME.empirical))
+
   }, [])
 
 

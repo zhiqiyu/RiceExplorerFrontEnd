@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { getCookie } from './utils/csrfToken';
 import { setToken } from './features/phenology/csrfTokenSlice';
+import ClassificationApp from './pages/ClassificationApp';
 
 
 function App() {
@@ -34,6 +35,9 @@ function App() {
         </Route>
         <Route exact path="/phenology">
           <PhenologyApp />
+        </Route>
+        <Route exact path="/classification">
+          <ClassificationApp />
         </Route>
       </Switch>
       </main>

@@ -39,12 +39,21 @@ export let geojsonLayer = null;
 export const setGeojsonLayer = (layer) => geojsonLayer = layer
 
 export const addTileOverlays = (overlays) => {
-  overlays.forEach((overlay) => {
-    overlay.layer.addTo(map);
-    layerControlRef.current.addOverlay(overlay.layer, overlay.name);
-    tileOverlays.push(overlay.layer);
-  });
+  if (map) {
+    overlays.forEach((overlay) => {
+      overlay.layer.addTo(map);
+      layerControlRef.current.addOverlay(overlay.layer, overlay.name);
+      tileOverlays.push(overlay.layer);
+    });
+  }
 };
+
+export const addGeoJsonOverlay = () => {
+  if (geojsonLayer && map) {
+    geojsonLayer.addTo(map);
+    layerControlRef.current.addOverlay(geojsonLayer, "samples")
+  }
+}
 
 // export const replaceOverlays = (overlays) => {
 //   overlayLayers.forEach(layer => {
@@ -99,6 +108,9 @@ export function Map(props) {
         id="map"
         whenCreated={(m) => {
           map = m;
+
+          addTileOverlays(tileOverlays)
+          addGeoJsonOverlay()
         }}
       >
         <LayersControl ref={lcRef}>
