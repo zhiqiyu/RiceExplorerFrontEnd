@@ -7,16 +7,16 @@ import _ from "lodash";
 import L from 'leaflet'
 import { map, layerControlRef, addTileOverlays, removeAllOverlays } from "../LeafletMap"
 import { SatelliteDataFilters, AuxDataFilters } from "../DataFilterGroup";
-import { SeasonFilterGroup } from "../SeasonFilterGroup";
 
-import {update, changeModel, updateModelSpecs, MODEL_SPECS } from "../../features/phenology/classificationSlice"
+// import {update as updateDatasetFilters } from "../../features/phenology/datasetSlice"
+import { update, changeModel, updateModelSpecs, MODEL_SPECS } from "../../features/phenology/classificationSlice"
 import { InfoCircle, InfoCircleFill, InfoSquare, QuestionCircle } from "react-bootstrap-icons";
 import { SampleContainer } from "./SamplePanel";
 
 const tabNames = {
   tab1: "Datasets",
-  tab2: "Classification",
-  tab3: "Samples"
+  tab2: "Samples",
+  tab3: "Classification",
 }
 
 export const ClassificationPanel = (props) => {
@@ -25,10 +25,10 @@ export const ClassificationPanel = (props) => {
 
   // state from redux store
   const csrfToken = useSelector(state => state.csrfToken)
-  // const datasetFilters = useSelector(state => state.dataset)
+  const datasetFilters = useSelector(state => state.dataset)
   // const seasonFilters = useSelector(state => state.seasons)
   const classificationState = useSelector(state => state.classification)
-  const editing = useSelector(state => state.editing)
+  const sampleState = useSelector(state => state.samples)
   const dispatch = useDispatch()
 
   // local state
@@ -38,96 +38,94 @@ export const ClassificationPanel = (props) => {
 
   const [downloadUrl, setDownLoadUrl] = useState({})
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault()
-  //   const form = e.currentTarget;
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const form = e.currentTarget;
     
-  //   if (form.checkValidity() === false) {
-  //     e.stopPropagation();
-  //     setValidated(true)
-  //     // setSuccess(false)
-  //     return
-  //   } 
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+      setValidated(true)
+      // setSuccess(false)
+      return
+    } 
     
-  //   // validate passed
-  //   setValidated(false)
-  //   // setSuccess(true)
-  //   // setTimeout(() => setSuccess(undefined), 2000)
+    // validate passed
+    setValidated(false)
+    // setSuccess(true)
+    // setTimeout(() => setSuccess(undefined), 2000)
 
-  //   const formData = new FormData()
+    const formData = new FormData()
 
-  //   let jsonData = {}
-  //   seasonNames.forEach(name => {
-  //     if (seasonFilters[name]['on']) {
-  //       jsonData[name] = _.cloneDeep(seasonFilters[name])
-  //       delete jsonData[name].on
-  //     }
-  //   })
+    let jsonData = {}
 
-  //   jsonData['dataset'] = _.cloneDeep(datasetFilters)
-  //   if (jsonData['dataset'].boundary_file) {
-  //     formData.append('file', jsonData['dataset'].boundary_file)
-  //     delete jsonData['dataset'].boundary_file
-  //   } 
+    jsonData['dataset'] = _.cloneDeep(datasetFilters)
+    if (jsonData['dataset'].boundary_file) {
+      formData.append('boundary_file', jsonData['dataset'].boundary_file)
+      delete jsonData['dataset'].boundary_file
+    } 
+    jsonData['classification'] = _.cloneDeep(classificationState)
 
-  //   formData.append('json', new Blob([JSON.stringify(jsonData)], {
-  //     type: 'application/json'
-  //   }));
-
+    formData.append('json', new Blob([JSON.stringify(jsonData)], {
+      type: 'application/json'
+    }));
     
-  //   axios.post("empirical/", formData, {
-  //     baseURL: process.env.PUBLIC_URL,
-  //     headers: {
-  //       "X-CSRFToken": csrfToken,
-  //     },
+    if (sampleState.geojson.features.length !== 0) {
+      formData.append('samples', new Blob([JSON.stringify(sampleState.geojson)], {
+        type: 'application/json'
+      }));
+    }
+    
+    axios.post("classification/", formData, {
+      baseURL: process.env.PUBLIC_URL,
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
       
-  //   }).then(response => {
-  //     let res_body = response.data
+    }).then(response => {
+      let res_body = response.data
 
-  //     // add all new overlays
-  //     let overlays = []
-  //     Object.keys(res_body).forEach(key => {
-  //       let layer = new L.TileLayer(res_body[key].tile_url)
-  //       let overlay = {
-  //         layer: layer,
-  //         name: key,
-  //         url: res_body[key].download_url
-  //       }
-  //       overlays.push(overlay)
+      // add all new overlays
+      let overlays = []
+      Object.keys(res_body).forEach(key => {
+        let layer = new L.TileLayer(res_body[key].tile_url)
+        let overlay = {
+          layer: layer,
+          name: key,
+          url: res_body[key].download_url
+        }
+        overlays.push(overlay)
 
-  //       if (res_body[key].area) {
-  //         setInfo("Rice area: " + res_body[key].area + " ha")
-  //       }
-  //     })
-  //     addTileOverlays(overlays)
+        if (res_body[key].area) {
+          setInfo("Rice area: " + res_body[key].area.toFixed(3) + " ha")
+        }
+      })
+      addTileOverlays(overlays)
 
-  //     setLoading(false)
+      setLoading(false)
 
-  //   }).catch(reason => {
-  //     setLoading(false)
-  //     alert(reason)
-  //   })
+    }).catch(reason => {
+      setLoading(false)
+      alert(reason)
+    })
 
-  //   // set loading state
-  //   setLoading(true)
+    // set loading state
+    setLoading(true)
 
-  //   // remove all overlays
-  //   removeAllOverlays()
-  // }
+    // remove all overlays
+    removeAllOverlays()
+  }
 
-  // const handleExport = (key) => {
-  //   if (key === 'season') {
-  //     // Object.keys(downloadUrl).map(key => {
-  //     //   if (key !== "combined") {
+  const handleExport = (key) => {
+    if (key === 'season') {
+      // Object.keys(downloadUrl).map(key => {
+      //   if (key !== "combined") {
 
-  //     //   }
-  //     // })
-  //   } else {
+      //   }
+      // })
+    } else {
 
-  //   }
-  // }
-
-  const handleSubmit = () => {}
+    }
+  }
 
   const handleChange = (field, value) => {
     if (field === "model") {
@@ -171,7 +169,12 @@ export const ClassificationPanel = (props) => {
                     <AuxDataFilters />
                   </fieldset>
                 </TabPane>
-                <TabPane eventKey={tabNames.tab2}>
+
+                <TabPane eventKey={tabNames.tab2}>         
+                  <SampleContainer />
+                </TabPane>
+
+                <TabPane eventKey={tabNames.tab3} >
                   <Card className="mb-2 border-secondary">
                     <Card.Header>
                       <h6 className="m-0 p-0">
@@ -288,14 +291,8 @@ export const ClassificationPanel = (props) => {
                     </Card.Body>
                   </Card>
 
-                  <Button className="w-100" onClick={() => handleRun()} >Run</Button>
-
+                  <Button className="w-100" type="submit">Run</Button>
                   
-
-                </TabPane>
-
-                <TabPane eventKey={tabNames.tab3} >
-                  <SampleContainer />
                 </TabPane>
 
               </TabContent>

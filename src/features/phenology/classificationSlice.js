@@ -54,8 +54,8 @@ const classificationSlice = createSlice({
       return {...state, "model_specs": {...state.model_specs, ...action.payload}}
     },
     changeModel: (state, action) => {
-      if (action.payload !== state.model) {
-        state.model_spec = {}
+      if (action.payload && action.payload !== state.model) {
+        state.model_specs = {}
         Object.keys(MODEL_SPECS[action.payload]).forEach(key => {
           if ("default" in MODEL_SPECS[action.payload][key]) {
             state.model_specs[key] = MODEL_SPECS[action.payload][key]["default"]

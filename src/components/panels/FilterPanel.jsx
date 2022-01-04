@@ -11,7 +11,7 @@ import { SeasonFilterGroup } from "../SeasonFilterGroup";
 
 const tabNames = {
   tab1: "Datasets",
-  tab2: "Filters"
+  tab2: "Seasons"
 }
 
 export const FilterPanel = (props) => {
@@ -60,7 +60,7 @@ export const FilterPanel = (props) => {
 
     jsonData['dataset'] = _.cloneDeep(datasetFilters)
     if (jsonData['dataset'].boundary_file) {
-      formData.append('file', jsonData['dataset'].boundary_file)
+      formData.append('boundary_file', jsonData['dataset'].boundary_file)
       delete jsonData['dataset'].boundary_file
     } 
 
@@ -90,7 +90,7 @@ export const FilterPanel = (props) => {
         overlays.push(overlay)
 
         if (res_body[key].area) {
-          setInfo("Rice area: " + res_body[key].area + " ha")
+          setInfo("Rice area: " + res_body[key].area.toFixed(3) + " ha")
         }
       })
       addTileOverlays(overlays)
