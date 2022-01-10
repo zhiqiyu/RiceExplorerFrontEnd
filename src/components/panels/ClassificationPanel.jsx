@@ -64,6 +64,14 @@ export const ClassificationPanel = (props) => {
       delete jsonData['dataset'].boundary_file
     } 
     jsonData['classification'] = _.cloneDeep(classificationState)
+    jsonData['classification']['class_property'] = sampleState['classProperty']
+    let model_specs = jsonData['classification']['model_specs']
+    for (let key in model_specs) {
+      if (model_specs[key] === null) {
+        delete model_specs[key]
+      }
+    }
+
 
     formData.append('json', new Blob([JSON.stringify(jsonData)], {
       type: 'application/json'
@@ -99,6 +107,7 @@ export const ClassificationPanel = (props) => {
           setInfo("Rice area: " + res_body[key].area.toFixed(3) + " ha")
         }
       })
+
       addTileOverlays(overlays)
 
       setLoading(false)
@@ -111,7 +120,7 @@ export const ClassificationPanel = (props) => {
     // set loading state
     setLoading(true)
 
-    // remove all overlays
+    // remove all overlays before loading results
     removeAllOverlays()
   }
 
