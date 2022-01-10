@@ -41,6 +41,7 @@ export const MODEL_SPECS = {
 const initialState = {
   "start_date": null,
   "end_date": null,
+  "training_ratio": 0.7,
   "model": "",
   "model_specs": {}
 }

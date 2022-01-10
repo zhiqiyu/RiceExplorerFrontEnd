@@ -231,10 +231,30 @@ export const ClassificationPanel = (props) => {
                   <Card className="mb-2 border-secondary">
                     <Card.Header>
                       <h6 className="m-0 p-0">
-                        Model Specs
+                        Classification Details
                       </h6>
                     </Card.Header>
                     <Card.Body>
+
+                      <Form.Group
+                        as={Row}
+                        controlId={"train_test_ratio"}
+                        className="mb-2 align-items-center"
+                      >
+                        <Form.Label column xs={4}>
+                          Training Ratio: 
+                        </Form.Label>
+                        <Col xs={8}>
+                          <Form.Control
+                            type="number"
+                            step={"0.05"}
+                            value={classificationState["training_ratio"]}
+                            onChange={(e) => handleChange("training_ratio", e.target.value)}
+                          />
+                        </Col>
+
+                      </Form.Group>
+
                       <Form.Group
                         as={Row}
                         controlId={"model"}
@@ -259,42 +279,7 @@ export const ClassificationPanel = (props) => {
                       </Form.Group>
 
                       {classificationState["model"] && Object.keys(MODEL_SPECS[classificationState["model"]]).map(key => (
-                        <Form.Group
-                          as={Row}
-                          controlId={key}
-                          className="mb-2 align-items-center"
-                        >
-                          <Form.Label column xs={4}>
-                            {key}
-                            {"  "}
-                            <OverlayTrigger
-                              trigger="hover"
-                              placement="right"
-                              overlay={
-                                <Popover>
-                                  <Popover.Body>
-                                    {MODEL_SPECS[classificationState["model"]][key]["description"]}
-                                  </Popover.Body>
-                                </Popover>
-                              }
-                            >
-                              <InfoCircle />
-                            </OverlayTrigger>
-
-                          </Form.Label>
-                          <Col xs={8}>
-                            
-                            <Form.Control
-                              type="number"
-                              placeholder="Use default"
-                              step={MODEL_SPECS[classificationState["model"]][key]["type"] === "int" ? "1" : null}
-                              value={classificationState["model_specs"][key]}
-                              onChange={(e) => handleChange(`model.${key}`, e.target.value)}
-                            />
-                            
-                            
-                          </Col>
-                        </Form.Group>
+                        <ModelSpecItem specName={key} handleChange={handleChange}/>
                       ))}
 
                     </Card.Body>
@@ -313,102 +298,95 @@ export const ClassificationPanel = (props) => {
   )
 }
 
-// const SampleContainer = () => {
+const ModelSpecItem = ({specName, handleChange}) => {
 
-//   const sampleState = useSelector((state) => state.samples);
-//   const dispatch = useDispatch();
+  const classificationState = useSelector(state => state.classification)
 
-//   return (
-//     <div className="sample-container px-2 pt-2">
-//       <Card className="h-100">
-//         <Card.Header>
-//           <div className="d-flex justify-content-between align-items-center">
-//             <div>
-//               <h6 className="m-0 p-0">
-//                 Samples { `(count: ${sampleState.geojson.features.length})`}
-//               </h6>
-//             </div>
-//             <div>
-//               <Button
-//                 variant="light"
-//                 size="sm"
-//                 className="h-100 w-100 px-0"
-//                 as="label"
-//                 htmlFor="sample-upload"
-//               >
-//                 <FileEarmarkArrowUpFill />
-//               </Button>
-//               <input
-//                 type="file"
-//                 className="d-none"
-//                 id="sample-upload"
-//                 onChange={handleUploadFile}
-//               />
-//             </div>
-//           </div>
-//         </Card.Header>
-//         <Card.Body className="p-2">
-//           <div className="container card mb-2">
-//             <div className="p-2">
-//               <div className="row align-items-center mb-2">
-//                 {/* <Form onSubmit={handleSaveClassProperty}> */}
-//                 <div className="col-auto">Class field:</div>
-//                 <div className="col">
-//                   <Form.Select 
-//                     className="w-100"
-//                     value={sampleState.classProperty.name}
-//                     onChange={e => handleSelectClassField(e.target.value)}
-//                   >
-//                     {sampleState.geojson.features.length !== 0 && Object.keys(sampleState.geojson.features[0].properties).map(k => (
-//                       <option key={k}>{k}</option>
-//                     ))}
-//                   </Form.Select>
-//                 </div>
-//               </div>
-//               <div className="row align-items-center">
-//                 <div className="col-auto">Class value:</div>
-//                 <div className="col"> 
-//                   {/* <Form.Control 
-//                     size="sm" 
-//                     type="text" 
-//                     value={positiveValueState}
-//                     onChange={e => setPositiveValueState(e.target.value)}
-//                   /> */}
-//                   <Form.Select 
-//                     value={sampleState.classProperty.positiveValue}
-//                     onChange={e => handleChangeClassValue(e.target.value)}
-//                   >
-//                     <option selected></option>
-//                     {sampleState.geojson.features.length !== 0 && [...new Set(sampleState.geojson.features.map(feature => feature.properties[sampleState.classProperty.name]))].map(v => {
-//                       return (<option key={v}>{v}</option>)
-//                     })
-//                     }
-//                   </Form.Select>
-//                 </div>
-//                 {/* <div><Button type="submit" >Save</Button></div>
-//                 </Form> */}
-//               </div>
-//             </div>
-//           </div>
+  let selectedModel = classificationState["model"]
 
-//           <ListGroup className="sample-list">
-//             {sampleState.geojson &&
-//               sampleState.geojson.features.map((feature, idx) => (
-//                 <SampleItem feature={feature} idx={idx} />
-//                 // <ListGroup.Item
-//                 //   action
-//                 //   className="px-3 py-1"
-//                 //   key={idx}
-//                 //   onClick={() => handleSelectSample(feature.properties[idField])}
-//                 //   active={feature.properties[idField] === sampleState.selected}
-//                 //   style={{backgroundColor: feature.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue ? "lightgreen" : null}}
-//                 // >
-//                 //   {`${feature.properties[idField]} - ${feature.properties[sampleState.classProperty.name]}`}
-//                 // </ListGroup.Item>
-//               ))}
-//           </ListGroup>
-//         </Card.Body>
-//       </Card>
-//     </div>
-//   )
-// }
+  const handleModelSpecChange = (e) => {
+    handleChange(`model.${specName}`, e.target.value)
+  }
+
+  let renderLabel = () => {
+    return (
+      <Form.Label column xs={4}>
+        {specName}
+        {"  "}
+        <OverlayTrigger
+          trigger="hover"
+          placement="right"
+          overlay={
+            <Popover>
+              <Popover.Body>
+                {MODEL_SPECS[selectedModel][specName]["description"]}
+              </Popover.Body>
+            </Popover>
+          }
+        >
+          <InfoCircle />
+        </OverlayTrigger>
+      </Form.Label>
+    )
+  }
+
+  let renderInput = () => {
+    switch (MODEL_SPECS[selectedModel][specName]["type"]) {
+      case "int":
+        return (
+          <Form.Control
+            type="number"
+            placeholder="Leave blank to use default value"
+            step={"1"}
+            value={classificationState["model_specs"][specName]}
+            onChange={handleModelSpecChange}
+          />
+        )
+      case "float":
+        return (
+          <Form.Control
+            type="number"
+            placeholder="Leave blank to use default value"
+            step={"0.1"}
+            value={classificationState["model_specs"][specName]}
+            onChange={handleModelSpecChange}
+          />
+        )
+      case "string":
+        return (
+          <Form.Control
+            type="text"
+            value={classificationState["model_specs"][specName]}
+            onChange={handleModelSpecChange}
+          />
+        )
+      case "select":
+        return (
+          <Form.Select 
+            value={classificationState["model_specs"][specName]}
+            onChange={handleModelSpecChange}
+          >
+          {MODEL_SPECS[selectedModel][specName]["options"].map(option => (
+            <option key={option}>{option}</option>
+          ))}
+          </Form.Select>
+        )
+      default:
+        return (<></>);
+    }
+  }
+
+  return (
+    <Form.Group
+      as={Row}
+      controlId={specName}
+      className="mb-2 align-items-center"
+    >
+      {renderLabel()}
+      <Col xs={8}>
+        {renderInput()}
+      </Col>
+    </Form.Group>
+  )
+
+}
