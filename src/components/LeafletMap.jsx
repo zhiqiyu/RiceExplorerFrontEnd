@@ -39,7 +39,7 @@ export let geojsonLayer = null;
 export const setGeojsonLayer = (layer) => geojsonLayer = layer
 
 export const addTileOverlays = (overlays) => {
-  if (map) {
+  if (map && layerControlRef.current) {
     overlays.forEach((overlay) => {
       overlay.layer.addTo(map);
       layerControlRef.current.addOverlay(overlay.layer, overlay.name);
@@ -49,7 +49,7 @@ export const addTileOverlays = (overlays) => {
 };
 
 export const addGeoJsonOverlay = () => {
-  if (geojsonLayer && map) {
+  if (geojsonLayer && map && layerControlRef.current) {
     geojsonLayer.addTo(map);
     layerControlRef.current.addOverlay(geojsonLayer, "samples")
   }
@@ -88,7 +88,13 @@ export function Map(props) {
 
   useEffect(() => {
     layerControlRef = lcRef;
+    setTimeout(() => {
+      addTileOverlays(tileOverlays)
+      addGeoJsonOverlay()
+    }, 400)
+    
   }, []);
+
 
   useEffect(() => {
     if (sampleState.selected) {
@@ -108,9 +114,6 @@ export function Map(props) {
         id="map"
         whenCreated={(m) => {
           map = m;
-
-          addTileOverlays(tileOverlays)
-          addGeoJsonOverlay()
         }}
       >
         <LayersControl ref={lcRef}>
