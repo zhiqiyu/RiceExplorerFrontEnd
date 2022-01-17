@@ -2,7 +2,8 @@
   "name": "rice_explorer",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8000",
+  "proxy": "http://127.0.0.1:8000",
+  "homepage": "/servir/rice-explorer",
   "dependencies": {
     "@reduxjs/toolkit": "^1.6.1",
     "@testing-library/jest-dom": "^5.14.1",
@@ -11,6 +12,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^5.0.2",
     "d3": "^7.1.1",
+    "file-saver": "^2.0.5",
     "leaflet": "^1.7.1",
     "lodash": "^4.17.21",
     "ol": "^4.6.5",
