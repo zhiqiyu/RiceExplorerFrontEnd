@@ -89,7 +89,7 @@ export default function SamplePanel() {
   useEffect(() => {
     if (typeof sampleState.selected === 'number') {
       // console.log(sampleState.selected.geometry.coordinates.reverse())
-      let selected_sample = sampleState.geojson.features.filter(f => f.properties[idField] === sampleState.selected)[0]
+      let selected_sample = sampleState.geojson.features.filter(f => f.properties[idField] == sampleState.selected)[0]
       let latlon = [...selected_sample.geometry.coordinates].reverse()
       panToLatLng(latlon)
       if (geojsonLayer) {
@@ -112,7 +112,7 @@ export default function SamplePanel() {
 
     geojsonLayer.eachLayer(layer => {
       let geoJsonPoint = layer.feature;
-      if (geoJsonPoint.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue) {
+      if (geoJsonPoint.properties[sampleState.classProperty.name] == sampleState.classProperty.positiveValue) {
         layer.setStyle({
           radius: 3, 
           fillColor: "red", 
@@ -652,8 +652,8 @@ const SampleItem = (props) => {
       className="px-3 py-1"
       key={idx}
       onClick={() => handleSelectSample(feature.properties[idField])}
-      active={feature.properties[idField] === sampleState.selected}
-      style={{backgroundColor: feature.properties[sampleState.classProperty.name] === sampleState.classProperty.positiveValue ? "lightgreen" : null}}
+      active={feature.properties[idField] == sampleState.selected}
+      style={{backgroundColor: feature.properties[sampleState.classProperty.name] == sampleState.classProperty.positiveValue ? "lightgreen" : null}}
     >
       <div className="d-flex align-items-center flex-row justify-content-between">
         <div>
