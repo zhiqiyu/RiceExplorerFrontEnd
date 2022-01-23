@@ -55,16 +55,6 @@ export const addGeoJsonOverlay = () => {
   }
 }
 
-// export const replaceOverlays = (overlays) => {
-//   overlayLayers.forEach(layer => {
-//     layerControl.removeLayer(layer)
-//     map.removeLayer(layer)
-//   })
-
-//   overlays = action.payload
-//   return state
-// }
-
 export const removeAllOverlays = (state) => {
   tileOverlays.forEach((layer) => {
     layerControlRef.current.removeLayer(layer);
