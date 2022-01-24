@@ -70,7 +70,9 @@ export const panToLatLng = ([lat, lng]) => {
 
 
 export function Map(props) {
-  const { showEditControl, showInfoControl, info } = props;
+  const { info } = props;
+
+  const appName = useSelector(state => state.appName)
 
   const lcRef = useRef();
 
@@ -96,39 +98,72 @@ export function Map(props) {
     }
   }, [sampleState.selected])
 
-  const displayMap = useMemo(
-    () => (
-      <MapContainer
-        center={[28.5973518, 83.54495724]}
-        zoom={8}
-        id="map"
-        whenCreated={(m) => {
-          map = m;
-        }}
-      >
-        <LayersControl ref={lcRef}>
-          {/* base maps */}
-          {Object.entries(BASEMAPS).map(([name, basemap]) => (
-            <LayersControl.BaseLayer
-              name={name}
-              checked={name === defaultBaseMap}
-              key={name}
-            >
-              <TileLayer url={basemap.url} attribution={basemap.attribution} />
-            </LayersControl.BaseLayer>
-          ))}
+  useEffect(()=>{
+    if (map) {
+      map.invalidateSize();
+    }
+  },[appName])
 
-        </LayersControl>
+  // const displayMap = useMemo(
+  //   () => (
+  //     <MapContainer
+  //       center={[28.5973518, 83.54495724]}
+  //       zoom={8}
+  //       id="map"
+  //       whenCreated={(m) => {
+  //         map = m;
+  //       }}
+  //     >
+  //       <LayersControl ref={lcRef}>
+  //         {/* base maps */}
+  //         {Object.entries(BASEMAPS).map(([name, basemap]) => (
+  //           <LayersControl.BaseLayer
+  //             name={name}
+  //             checked={name === defaultBaseMap}
+  //             key={name}
+  //           >
+  //             <TileLayer url={basemap.url} attribution={basemap.attribution} />
+  //           </LayersControl.BaseLayer>
+  //         ))}
 
-        {showEditControl ? <EditingControl /> : null}
+  //       </LayersControl>
 
-        {showInfoControl ? <InfoControl info={info} /> : null}
-      </MapContainer>
-    ),
-    [showEditControl, info]
+  //       {/* {showEditControl ? <EditingControl /> : null} */}
+
+  //       {appName !== "phenology" ? <InfoControl info={info} /> : null}
+  //     </MapContainer>
+  //   ),
+  //   []
+  // );
+
+  return (
+    <MapContainer
+      center={[28.5973518, 83.54495724]}
+      zoom={8}
+      id="map"
+      whenCreated={(m) => {
+        map = m;
+      }}
+    >
+      <LayersControl ref={lcRef}>
+        {/* base maps */}
+        {Object.entries(BASEMAPS).map(([name, basemap]) => (
+          <LayersControl.BaseLayer
+            name={name}
+            checked={name === defaultBaseMap}
+            key={name}
+          >
+            <TileLayer url={basemap.url} attribution={basemap.attribution} />
+          </LayersControl.BaseLayer>
+        ))}
+
+      </LayersControl>
+
+      {/* {showEditControl ? <EditingControl /> : null} */}
+
+      {appName !== "phenology" ? <InfoControl info={info} /> : null}
+    </MapContainer>
   );
-
-  return displayMap;
 }
 
 const EditingControl = (props) => {

@@ -155,16 +155,16 @@ export const ClassificationPanel = (props) => {
     <div className="sidebar h-100 flex-column">
       <Form method="POST" onSubmit={handleSubmit} noValidate validated={validated}>
         <TabContainer defaultActiveKey={tabNames.tab1} unmountOnExit={false}>
-          <Row className="tabs-nav g-0">
+          <Row className="tabs-nav g-0 flex-wrap">
             <Nav variant="pills" className="h-100">
               <Col className="h-100 align-items-center p-1">
-                <Nav.Link className="tab-title align-middle w-100 h-100 h6" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>
+                <Nav.Link className="tab-title align-middle w-100 h-100 h6 mb-0" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>
               </Col>
               <Col className="h-100 align-items-center p-1">
-                <Nav.Link className="tab-title align-middle h-100 w-100 h6" eventKey={tabNames.tab2} >{tabNames.tab2}</Nav.Link>
+                <Nav.Link className="tab-title align-middle h-100 w-100 h6 mb-0" eventKey={tabNames.tab2} >{tabNames.tab2}</Nav.Link>
               </Col>
               <Col className="h-100 align-items-center p-1">
-                <Nav.Link className="tab-title align-middle h-100 w-100 h6" eventKey={tabNames.tab3} >{tabNames.tab3}</Nav.Link>
+                <Nav.Link className="tab-title align-middle h-100 w-100 h6 mb-0" eventKey={tabNames.tab3} >{tabNames.tab3}</Nav.Link>
               </Col>
             </Nav>
           </Row>

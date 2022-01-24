@@ -27,7 +27,7 @@ const json2table = (json) => {
       </thead>
       <tbody>
         {Object.entries(json).map(([key, val]) => (
-          <tr>
+          <tr key={key}>
             <td>{key}</td>
             <td>{val}</td>
           </tr>
@@ -313,16 +313,15 @@ export const SampleContainer = () => {
         <div className="container card mb-2">
           <div className="p-2">
             <div className="row align-items-center mb-2">
-              {/* <Form onSubmit={handleSaveClassProperty}> */}
               <div className="col-auto">Class field:</div>
               <div className="col">
                 <Form.Select 
                   className="w-100"
-                  value={sampleState.classProperty.name}
+                  value={sampleState.classProperty.name || ""}
                   disabled={!!!sampleState.geojson.features.length}
                   onChange={e => handleSelectClassField(e.target.value)}
                 >
-                  <option selected></option>
+                  <option></option>
                   {sampleState.geojson.features.length !== 0 && Object.keys(sampleState.geojson.features[0].properties).map(k => (
                     <option key={k}>{k}</option>
                   ))}
@@ -333,11 +332,11 @@ export const SampleContainer = () => {
               <div className="col-auto">Class value:</div>
               <div className="col"> 
                 <Form.Select 
-                  value={sampleState.classProperty.positiveValue}
+                  value={sampleState.classProperty.positiveValue || ""}
                   disabled={!!!sampleState.classProperty.name}
                   onChange={e => handleChangeClassValue(e.target.value)}
                 >
-                  <option selected></option>
+                  <option></option>
                   {sampleState.geojson.features.length !== 0 && [...new Set(sampleState.geojson.features.map(feature => feature.properties[sampleState.classProperty.name]))].map(v => {
                     return (<option key={v}>{v}</option>)
                   })
@@ -351,7 +350,7 @@ export const SampleContainer = () => {
         <ListGroup className="sample-list">
           {sampleState.geojson &&
             sampleState.geojson.features.map((feature, idx) => (
-              <SampleItem key={idx} feature={feature} idx={idx} />
+              <SampleItem feature={feature} idx={idx} />
             ))}
         </ListGroup>
       </Card.Body>

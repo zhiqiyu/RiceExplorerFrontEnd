@@ -122,7 +122,7 @@ export const FilterPanel = (props) => {
   }
   
   return (
-    <div className="sidebar h-100 flex-column">
+    <div className="h-100 flex-column">
       <Form method="POST" onSubmit={handleSubmit} noValidate validated={validated}>
         <TabContainer defaultActiveKey={tabNames.tab1} unmountOnExit={false}>
           <Row className="tabs-nav g-0">

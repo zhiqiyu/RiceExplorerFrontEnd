@@ -192,7 +192,7 @@ export const AuxDataFilters = (props) => {
   return (
     <Card className="mb-2 border-secondary">
       <Card.Header>
-        <h6 class="m-0 p-0">
+        <h6 className="m-0 p-0">
           Auxiliary Datasets
         </h6>
       </Card.Header>

@@ -5,18 +5,23 @@ import { MapCarousel } from "../MapCarousel"
 
 export default function MapPanel(props) {
 
-  const { showEditControl, showInfoControl, info } = props
+  const { info } = props
+
+  const appName = useSelector(state => state.appName)
 
   // const sampleGeoJson = useSelector(state => state.samples)
 
   return (
     <div className="w-100 h-100 d-flex flex-column">
       <div className="map-container">
-        <Map showEditControl={showEditControl} showInfoControl={showInfoControl} info={info} />
+        <Map info={info} />
       </div>
-      <div className="map-carousel-container">
-        <MapCarousel />
-      </div>
+      {appName === "phenology" ? (
+        <div className="map-carousel-container">
+          <MapCarousel />
+        </div>
+      ) : null}
+
     </div>
   )
 }
