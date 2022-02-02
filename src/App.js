@@ -3,7 +3,6 @@ import { BrowserRouter, NavLink, Route, Switch, useLocation } from 'react-router
 import Header from './components/Header'
 import Home from './pages/Home';
 import EmpiricalApp from './pages/EmpiricalApp';
-import './App.css'
 import PhenologyApp from './pages/PhenologyApp';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
@@ -18,6 +17,8 @@ import { ClassificationPanel } from './components/panels/ClassificationPanel';
 import SamplePanel from './components/panels/SamplePanel';
 import MapPanel from './components/panels/MapPanel';
 import { APP_NAME, setAppName } from './features/phenology/appNameSlice';
+
+import './App.css'
 
 
 function App() {
@@ -70,7 +71,11 @@ function App() {
         </div>
 
         <div className="mid-panel h-100">
-          <MapPanel info={info}/>
+          <Switch>
+            <Route exact path={["/empirical", "/phenology", "/classification"]}>
+              <MapPanel info={info}/>
+            </Route>
+          </Switch>
         </div>
 
         

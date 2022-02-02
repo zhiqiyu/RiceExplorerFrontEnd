@@ -57,12 +57,6 @@ export default function SettingsPanel(props) {
     // const formData = new FormData()
 
     let jsonData = {}
-    // seasonNames.forEach(name => {
-    //   if (seasonFilters[name]['on']) {
-    //     jsonData[name] = _.cloneDeep(seasonFilters[name])
-    //     delete jsonData[name].on
-    //   }
-    // })
 
     jsonData['dataset'] = _.cloneDeep(datasetFilters)
     delete jsonData.dataset.boundary_file
@@ -79,7 +73,8 @@ export default function SettingsPanel(props) {
     })
 
     jsonData['samples'] = samples
-    
+    jsonData['phenology_dates'] = sampleState.phenology
+
     // send request
     axios.post("phenology/", jsonData, {
       baseURL: process.env.PUBLIC_URL,
@@ -159,7 +154,7 @@ export default function SettingsPanel(props) {
     <div className="sidebar h-100 flex-column">
       
         <TabContainer defaultActiveKey={tabNames.tab1} unmountOnExit={false}>
-          <Row className="tabs-nav g-0">
+          <Row className="tabs-nav g-0 flex-wrap">
             <Nav variant="pills" className="h-100">
               <Col className="h-100 align-items-center p-1">
                 <Nav.Link className="tab-title align-middle w-100 h-100 h6" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>

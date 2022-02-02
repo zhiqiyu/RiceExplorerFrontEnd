@@ -122,10 +122,10 @@ export const FilterPanel = (props) => {
   }
   
   return (
-    <div className="h-100 flex-column">
+    <div className="sidebar h-100 flex-column">
       <Form method="POST" onSubmit={handleSubmit} noValidate validated={validated}>
         <TabContainer defaultActiveKey={tabNames.tab1} unmountOnExit={false}>
-          <Row className="tabs-nav g-0">
+          <Row className="tabs-nav g-0 flex-wrap">
             <Nav variant="pills" className="h-100">
               <Col className="h-100 align-items-center p-1">
                 <Nav.Link className="tab-title align-middle w-100 h-100 h6" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>

@@ -12,6 +12,9 @@ const initialDatasetState = {
   boundary: "CHITAWAN",
   boundary_file: null,
   crop_mask: "projects/testee-319020/assets/terai_agri_mask",
+
+  phenology_start_date: "2019-01-01",
+  phenology_end_date: "2020-01-01",
 };
 
 export const datasetSlice = createSlice({

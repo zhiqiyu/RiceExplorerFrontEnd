@@ -135,7 +135,35 @@ export default function SamplePanel() {
       </div>
 
       <div className="chart-canvas p-2">
-        <div className="w-100 h-100 bg-white">
+        <Card className="h-100 w-100">
+          <Card.Body className="p-2">
+          {chartData ?
+            <Chart 
+              width="100%" 
+              height="90%" 
+              chartType="LineChart" 
+              loader={<div>Loading Chart...</div>} 
+              data={chartData}
+              options={{
+                hAxis: {
+                  title: 'Date',
+                  format: "yyyy-MM-dd"
+                },
+                vAxis: {
+                  title: 'Value',
+                },
+                legend: {
+                  position: 'bottom'
+                },
+              }}
+              rootProps={{ 'data-testid': '1' }}
+            />
+            :
+            "Click on an sample to see its phenology"
+          }
+          </Card.Body>
+        </Card>
+        {/* <div className="chart-canvas w-100 h-100 p-2">
         {chartData ?
           <Chart 
             width="100%" 
@@ -160,7 +188,7 @@ export default function SamplePanel() {
           :
           "Click on an sample to see its phenology"
         }
-        </div>
+        </div> */}
       </div>
     </div>
   );

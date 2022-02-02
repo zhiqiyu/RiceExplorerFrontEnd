@@ -1,32 +1,24 @@
 import axios from "axios";
 import { Fragment, useEffect, useState } from "react";
 import { MapContainer, Marker, TileLayer } from "react-leaflet"
+import { Form, Row, Col, Button, Card } from "react-bootstrap"
 import { useSelector } from "react-redux";
 import { BASEMAPS } from "../utils/constants";
-import _ from "lodash"
+import _, { sample } from "lodash"
 
 import { idField } from "./panels/SamplePanel"
 import { addTileOverlays } from "./LeafletMap";
 import L from "leaflet"
+import { useDispatch } from "react-redux";
+import { changePhenologyDate } from "../features/phenology/sampleSlice";
 
-const smallMapObjs = {
-  "Jan": null, 
-  "Feb": null, 
-  "Mar": null, 
-  "Apr": null, 
-  "May": null, 
-  "Jun": null, 
-  "Jul": null, 
-  "Aug": null, 
-  "Sep": null, 
-  "Oct": null, 
-  "Nov": null, 
-  "Dec": null
-}
+// let smallMapObjs = {
+  
+// }
 
 const SmallMap = (props) => {
 
-  const { month, point } = props
+  const { date, point, setMapObj } = props
 
   return (
     <MapContainer
@@ -34,11 +26,20 @@ const SmallMap = (props) => {
       zoom={15}
       className="small-map"
       zoomControl={false}
-      whenCreated={(m) => smallMapObjs[month] = m}
+      whenCreated={(m) => {
+        setMapObj(state => {
+          let new_state = {...state, [date]: m}
+          return new_state
+        })
+      }}
     >
-      <TileLayer url={BASEMAPS["Google Satellite"].url} attribution={BASEMAPS["Google Satellite"].attribution} />
+      <TileLayer 
+        url={BASEMAPS["Google Satellite"].url} 
+        attribution={BASEMAPS["Google Satellite"].attribution} 
+      />
       
       {point && <Marker position={point}/>}
+      
     </MapContainer>
   )
 }
@@ -48,26 +49,29 @@ export const MapCarousel = (props) => {
   const sampleSlice = useSelector(state => state.samples)
   let selectedSample = sampleSlice.geojson.features.filter(f => f.properties[idField] === sampleSlice.selected)[0]
 
-  const { date_start, date_end } = props 
+  const dispatch = useDispatch()
+
+  const [smallMapObjs, setSmallMapObjs] = useState({})
+
 
   // load false color basemaps for small maps
-  useEffect(() => {
-    // TODO: change year to reflect the true year
-    let year = 2019 
-    axios.get("phenology/monthly_composite", {
-      baseURL: process.env.PUBLIC_URL,
-      params: {
-        year: year,
-      }
-    }).then(res => {
-      let body = res.data
-      Object.keys(smallMapObjs).forEach(month => {
-        const url = body[month]
-        let layer = new L.TileLayer(url)
-        layer.addTo(smallMapObjs[month])
-      })
-    })
-  }, [])
+  // useEffect(() => {
+  //   // TODO: change year to reflect the true year
+  //   let year = 2019 
+  //   axios.get("phenology/monthly_composite", {
+  //     baseURL: process.env.PUBLIC_URL,
+  //     params: {
+  //       year: year,
+  //     }
+  //   }).then(res => {
+  //     let body = res.data
+  //     Object.keys(smallMapObjs).forEach(month => {
+  //       const url = body[month]
+  //       let layer = new L.TileLayer(url)
+  //       layer.addTo(smallMapObjs[month])
+  //     })
+  //   })
+  // }, [])
 
   // move 
   useEffect(() => {
@@ -78,14 +82,106 @@ export const MapCarousel = (props) => {
     }
   }, [sampleSlice.selected])
 
+  useEffect(() => {
+    let newSmallMapObj = {}
+    let { start_date, end_date } = sampleSlice.phenology
+    start_date = new Date(start_date)
+    end_date = new Date(end_date)
+    let temp_date = start_date
+    while (temp_date <= end_date) {
+      let key = `${temp_date.getUTCFullYear()}-${temp_date.getUTCMonth()+1}`
+      newSmallMapObj[key] = smallMapObjs[key] 
+      temp_date.setUTCMonth(temp_date.getUTCMonth() + 1)
+    }
+    setSmallMapObjs(newSmallMapObj)
+  }, [sampleSlice.phenology])
+
+  const handleClick = (e) => {
+    axios.get("phenology/monthly_composite", {
+      baseURL: process.env.PUBLIC_URL,
+      params: {
+        start_date: sampleSlice.phenology.start_date,
+        end_date: sampleSlice.phenology.end_date
+      }
+    }).then(res => {
+      let body = res.data
+      Object.keys(smallMapObjs).forEach(date => {
+        const url = body[date]
+        let layer = new L.TileLayer(url)
+        layer.addTo(smallMapObjs[date])
+      })
+    })
+  }
+
   return (
     <div className="map-carousel h-100 d-flex overflow-auto">
-      {Object.keys(smallMapObjs).map(month => (
-        <div className="p-1 d-flex flex-column" style={{width:250, flex: "0 0 auto"}} key={month}>
-          <div>{month}</div>
-          <SmallMap point={selectedSample && [...selectedSample.geometry.coordinates].reverse()} month={month}/>
+      <div className="ps-2 py-2 pe-1" style={{width:280, flexShrink: 0}}>
+        <Card className="w-100 h-100">
+          <Card.Body className="p-2">
+            <Form.Group
+              as={Row}
+              controlId={"phenology_start_date"}
+              className="mb-2"
+            >
+              
+              <Form.Label column sm="3"> 
+                From
+              </Form.Label>
+              <Col sm="9">
+                <Form.Control
+                  type="month"
+                  name={`phenology_start_date`}
+                  value={sampleSlice.phenology.start_date}
+                  onChange={(e) => dispatch(changePhenologyDate({
+                    start_date: e.target.value
+                  }))}
+                  className="w-100"
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group
+              as={Row}
+              controlId={"phenology_end_date"}
+            >
+              <Form.Label column sm={"3"}>
+                To
+              </Form.Label>
+              <Col sm={"9"}>
+                <Form.Control
+                  type="month"
+                  name={`phenology_end_date`}
+                  value={sampleSlice.phenology.end_date}
+                  onChange={(e) => dispatch(changePhenologyDate({
+                    end_date: e.target.value
+                  }))}
+                />
+              </Col>
+              
+            </Form.Group>
+            <Row className="pt-2 justify-content-center">
+              <Col sm="auto">
+                <Button onClick={handleClick}>Load Composites</Button>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+      </div>
+
+      {Object.keys(smallMapObjs).map(date => (
+        <div className="px-1 py-2" style={{width:250, flexShrink: 0}}>
+          <Card className="w-100 h-100" key={date}>
+            <Card.Header className="py-0 text-center">{date}</Card.Header>
+            <Card.Body className="p-0">
+              <SmallMap 
+                point={selectedSample && [...selectedSample.geometry.coordinates].reverse()} 
+                date={date}
+                setMapObj={setSmallMapObjs}
+              />
+            </Card.Body>
+          </Card>
         </div>
       ))}
+
     </div>
   )
 }
