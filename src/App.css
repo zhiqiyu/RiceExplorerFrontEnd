@@ -174,7 +174,7 @@ font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
 .info-board {
     background-color: rgba(255,255,255,0.8);
     width: 200px;
-    height: 100px;
+    min-height: 100px;
     padding: 8px;
 }
 

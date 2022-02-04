@@ -94,21 +94,52 @@ export const ClassificationPanel = (props) => {
 
       // add all new overlays
       let overlays = []
-      Object.keys(res_body).forEach(key => {
-        let layer = new L.TileLayer(res_body[key].tile_url)
-        let overlay = {
-          layer: layer,
-          name: key,
-          url: res_body[key].download_url
-        }
-        overlays.push(overlay)
+      let key = "classification_result"
+      let layer = new L.TileLayer(res_body[key].tile_url)
+      let overlay = {
+        layer: layer,
+        name: key,
+        url: res_body[key].download_url
+      }
+      overlays.push(overlay)
 
-        if (res_body[key].area) {
-          setInfo("Rice area: " + res_body[key].area.toFixed(3) + " ha")
-        }
-      })
+      let message = ""
+
+      if (res_body.area) {
+        message += "Rice area: <b>" + res_body.area.toFixed(3) + " ha</b>\n"
+      }
+      
+      if (res_body.confusion_matrix) {
+        let parsed = JSON.parse(res_body.confusion_matrix)
+        message += 
+        `Confusion matrix:
+          <table class="table">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">0</th>
+              <th scope="col">1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">0</td>
+              <td >${parsed[0][0]}</td>
+              <td >${parsed[0][1]}</td>
+            </tr>
+            <tr>
+              <th scope="row">1</td>
+              <td >${parsed[1][0]}</td>
+              <td >${parsed[1][0]}</td>
+            </tr>
+          </tbody>
+          </table>
+          `
+      }
 
       addTileOverlays(overlays)
+
+      setInfo(message)
 
       setLoading(false)
 
@@ -145,10 +176,6 @@ export const ClassificationPanel = (props) => {
       dispatch(update({ [field]: value }))
     }
     
-  }
-
-  const handleRun = () => {
-
   }
   
   return (
@@ -284,8 +311,22 @@ export const ClassificationPanel = (props) => {
 
                     </Card.Body>
                   </Card>
-
-                  <Button className="w-100" type="submit">Run</Button>
+                  
+                  <Button 
+                    className="w-100"
+                    type="submit" 
+                    variant={ loading ? "secondary" : "primary"} 
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <div>
+                        Running...
+                        <Spinner as="span" animation="border" size="sm" role="status" ></Spinner>
+                      </div> 
+                      ) 
+                      : 
+                      "Run"}
+                  </Button>
                   
                 </TabPane>
 

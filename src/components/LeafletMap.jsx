@@ -21,6 +21,8 @@ import { idField } from "./panels/SamplePanel"
 
 import L from "leaflet";
 
+import parse from 'html-react-parser'
+
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
@@ -199,7 +201,7 @@ const InfoControl = (props) => {
   return (
     <div className="leaflet-bottom leaflet-left">
       <div className="leaflet-control leaflet-bar info-board">
-        {info}
+        {parse(info)}
       </div>
     </div>
   );
