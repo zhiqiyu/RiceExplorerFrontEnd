@@ -1,17 +1,17 @@
 import { Button, Col, Form, Nav, Row, Spinner, TabContainer, TabContent, TabPane } from "react-bootstrap";
-import { SatelliteDataFilters, AuxDataFilters } from "../DataFilterGroup";
-import { seasonNames } from '../../utils/constants'
-import { SeasonFilterGroup } from "../SeasonFilterGroup";
+import { SatelliteDataFilters, AuxDataFilters } from "../components/DataFilterGroup";
+import { seasonNames } from '../utils/constants'
+import { SeasonFilterGroup } from "../components/SeasonFilterGroup";
 import { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import _ from "lodash"
 import * as d3 from "d3"
-import { layerControlRef } from "../LeafletMap";
-import { replace, setResult } from "../../features/phenology/sampleSlice";
+import { layerControlRef } from "../components/LeafletMap";
+import { replace, setResult } from "../features/sampleSlice";
 import { idField } from "./SamplePanel";
 import { useEffect } from "react";
-import { actions } from "../../features/phenology/seasonSlice"
+import { actions } from "../features/seasonSlice"
 
 const tabNames = {
   tab1: "Datasets",
@@ -157,15 +157,15 @@ export default function SettingsPanel(props) {
           <Row className="tabs-nav g-0 flex-wrap">
             <Nav variant="pills" className="h-100">
               <Col className="h-100 align-items-center p-1">
-                <Nav.Link className="tab-title align-middle w-100 h-100 h6" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>
+                <Nav.Link className="tab-title align-middle w-100 h-100 h6 mb-0" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>
               </Col>
               <Col className="h-100 align-items-center p-1">
-                <Nav.Link className="tab-title align-middle h-100 w-100 h6" eventKey={tabNames.tab2} >{tabNames.tab2}</Nav.Link>
+                <Nav.Link className="tab-title align-middle h-100 w-100 h6 mb-0" eventKey={tabNames.tab2} >{tabNames.tab2}</Nav.Link>
               </Col>
             </Nav>
           </Row>
 
-          <Row className="tabs-content g-0 p-2">
+          <Row className="tabs-content g-0 p-2 mb-auto">
             <Col>
               <TabContent>
                 <TabPane eventKey={tabNames.tab1} >

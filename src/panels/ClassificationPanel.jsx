@@ -1,15 +1,15 @@
 import { useState } from "react"
 import { Form, TabContainer, Row, Col, Nav, TabContent, TabPane, Button, Spinner, Dropdown, DropdownButton, Card, OverlayTrigger, Popover } from "react-bootstrap"
 import { useSelector, useDispatch } from "react-redux"
-import { seasonNames } from '../../utils/constants'
+import { seasonNames } from '../utils/constants'
 import axios from "axios";
 import _ from "lodash";
 import L from 'leaflet'
-import { map, layerControlRef, addTileOverlays, removeAllOverlays } from "../LeafletMap"
-import { SatelliteDataFilters, AuxDataFilters } from "../DataFilterGroup";
+import { map, layerControlRef, addTileOverlays, removeAllOverlays } from "../components/LeafletMap"
+import { SatelliteDataFilters, AuxDataFilters } from "../components/DataFilterGroup";
 
-// import {update as updateDatasetFilters } from "../../features/phenology/datasetSlice"
-import { update, changeModel, updateModelSpecs, MODEL_SPECS } from "../../features/phenology/classificationSlice"
+// import {update as updateDatasetFilters } from "../../features/datasetSlice"
+import { update, changeModel, updateModelSpecs, MODEL_SPECS } from "../features/classificationSlice"
 import { InfoCircle, InfoCircleFill, InfoSquare, QuestionCircle } from "react-bootstrap-icons";
 import { SampleContainer } from "./SamplePanel";
 
@@ -113,7 +113,7 @@ export const ClassificationPanel = (props) => {
         let parsed = JSON.parse(res_body.confusion_matrix)
         message += 
         `Confusion matrix:
-          <table class="table">
+          <table class="table table-bordered table-sm">
           <thead>
             <tr>
               <th scope="col"></th>
@@ -130,7 +130,7 @@ export const ClassificationPanel = (props) => {
             <tr>
               <th scope="row">1</td>
               <td >${parsed[1][0]}</td>
-              <td >${parsed[1][0]}</td>
+              <td >${parsed[1][1]}</td>
             </tr>
           </tbody>
           </table>
@@ -196,8 +196,8 @@ export const ClassificationPanel = (props) => {
             </Nav>
           </Row>
           <Row className="tabs-content g-0 p-2">
-            <Col>
-              <TabContent>
+            <Col className="h-100">
+              <TabContent className="h-100">
                 <TabPane eventKey={tabNames.tab1} >
                   <fieldset >
                     <SatelliteDataFilters />

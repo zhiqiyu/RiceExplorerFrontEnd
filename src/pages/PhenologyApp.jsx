@@ -1,16 +1,17 @@
 import { createContext, Fragment } from "react"
 import { useEffect, useReducer, useState } from "react"
 import { Col, Container, Row } from "react-bootstrap"
-import MapPanel from "../components/panels/MapPanel"
-import SamplePanel from "../components/panels/SamplePanel"
-import SettingsPanel from "../components/panels/SettingsPanel"
+import MapPanel from "../panels/MapPanel"
+import SamplePanel from "../panels/SamplePanel"
+import SettingsPanel from "../panels/SettingsPanel"
 import Sidebar from "../components/Sidebar"
 import { TriplePanel } from "../components/TriplePanel"
 import { useDispatch } from "react-redux"
 import AppStatusBar from "../components/AppStatusBar"
-import { FilterPanel } from "../components/panels/FilterPanel"
+import { FilterPanel } from "../panels/FilterPanel"
 import { useSelector } from "react-redux"
-import { setAppName, APP_NAME } from "../features/phenology/appNameSlice"
+import { setAppName, APP_NAME } from "../features/appNameSlice"
+import SplitPane from "react-split-pane"
 
 export default function PhenologyApp() {
 
@@ -23,11 +24,11 @@ export default function PhenologyApp() {
   return (
     <Fragment>
       <AppStatusBar />
-      <Container fluid className="h-100 app-main pb-0 ps-0 pe-0">
+      <div className="app-main">
+      {/* <Container fluid className="h-100 app-main pb-0 ps-0 pe-0">
         <Row className="h-100 gx-0">
           <Col >
             <SettingsPanel />
-            {/* <FilterPanel appName={appName} /> */}
           </Col>
           <Col xs={"7"} >
             <MapPanel showEditControl={false} showInfoControl={false}/>
@@ -36,7 +37,16 @@ export default function PhenologyApp() {
             <SamplePanel />
           </Col>
         </Row>
-      </Container>
+      </Container> */}
+
+        <SplitPane split="vertical" defaultSize={200}>
+          <SettingsPanel />
+          <SplitPane split="vertical">
+            <MapPanel showEditControl={false} showInfoControl={false}/>
+            <SamplePanel />
+          </SplitPane>
+        </SplitPane>
+      </div>
     </Fragment>
   )
 }

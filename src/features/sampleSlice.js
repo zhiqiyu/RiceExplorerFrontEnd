@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { idField } from "../../components/panels/SamplePanel";
+import { idField } from "../panels/SamplePanel";
 
 const initialState = {
   selected: null,

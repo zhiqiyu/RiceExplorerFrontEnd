@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { APP_NAME, setAppName } from "../features/phenology/appNameSlice"
+import { APP_NAME, setAppName } from "../features/appNameSlice"
 
 export function Home() {
 

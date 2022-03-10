@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { dataList, featureList } from "../../utils/constants";
+import { dataList, featureList } from "../utils/constants";
 
 const initialDatasetState = {
   name: "COPERNICUS/S1_GRD",

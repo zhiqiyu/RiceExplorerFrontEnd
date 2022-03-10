@@ -1,13 +1,13 @@
 import { useState } from "react"
 import { Form, TabContainer, Row, Col, Nav, TabContent, TabPane, Button, Spinner, Dropdown, DropdownButton } from "react-bootstrap"
 import { useSelector, useDispatch } from "react-redux"
-import { seasonNames } from '../../utils/constants'
+import { seasonNames } from '../utils/constants'
 import axios from "axios";
 import _ from "lodash";
 import L from 'leaflet'
-import { map, layerControlRef, addTileOverlays, removeAllOverlays } from "../LeafletMap"
-import { SatelliteDataFilters, AuxDataFilters } from "../DataFilterGroup";
-import { SeasonFilterGroup } from "../SeasonFilterGroup";
+import { map, layerControlRef, addTileOverlays, removeAllOverlays } from "../components/LeafletMap"
+import { SatelliteDataFilters, AuxDataFilters } from "../components/DataFilterGroup";
+import { SeasonFilterGroup } from "../components/SeasonFilterGroup";
 
 const tabNames = {
   tab1: "Datasets",
@@ -90,7 +90,7 @@ export const FilterPanel = (props) => {
         overlays.push(overlay)
 
         if (res_body[key].area) {
-          setInfo("Rice area: " + res_body[key].area.toFixed(3) + " ha")
+          setInfo("Rice area: <b>" + res_body[key].area.toFixed(3) + " ha</b>\n")
         }
       })
       addTileOverlays(overlays)
@@ -128,10 +128,10 @@ export const FilterPanel = (props) => {
           <Row className="tabs-nav g-0 flex-wrap">
             <Nav variant="pills" className="h-100">
               <Col className="h-100 align-items-center p-1">
-                <Nav.Link className="tab-title align-middle w-100 h-100 h6" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>
+                <Nav.Link className="tab-title align-middle w-100 h-100 h6 mb-0" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>
               </Col>
               <Col className="h-100 align-items-center p-1">
-                <Nav.Link className="tab-title align-middle h-100 w-100 h6" eventKey={tabNames.tab2} >{tabNames.tab2}</Nav.Link>
+                <Nav.Link className="tab-title align-middle h-100 w-100 h6 mb-0" eventKey={tabNames.tab2} >{tabNames.tab2}</Nav.Link>
               </Col>
             </Nav>
           </Row>

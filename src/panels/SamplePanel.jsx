@@ -1,9 +1,9 @@
-import { useContext, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import ReactDOMServer from "react-dom/server";
-import { Button, ButtonGroup, Card, Form, ListGroup, Table } from "react-bootstrap";
+import { Button, ButtonGroup, Card, Col, Container, Form, ListGroup, Row, Table } from "react-bootstrap";
 import shp from "shpjs";
 import L from "leaflet";
-import { map, layerControlRef, addTileOverlays, panToLatLng, geojsonLayer, setGeojsonLayer, addGeoJsonOverlay } from "../LeafletMap";
+import { map, layerControlRef, addTileOverlays, panToLatLng, geojsonLayer, setGeojsonLayer, addGeoJsonOverlay } from "../components/LeafletMap";
 import { useDispatch, useSelector } from "react-redux";
 import {
   replace,
@@ -11,11 +11,11 @@ import {
   selectFeature,
   setClassProperty,
   deleteFeature
-} from "../../features/phenology/sampleSlice";
+} from "../features/sampleSlice";
 import { useEffect } from "react";
 import Chart from "react-google-charts";
 import _, { sample } from 'lodash'
-import { FileEarmarkArrowUpFill, SaveFill, TrashFill, Upload } from "react-bootstrap-icons";
+import { ArrowsFullscreen, FileEarmarkArrowUpFill, SaveFill, TrashFill, Upload } from "react-bootstrap-icons";
 import { saveAs } from 'file-saver'
 
 const json2table = (json) => {
@@ -29,7 +29,7 @@ const json2table = (json) => {
         {Object.entries(json).map(([key, val]) => (
           <tr key={key}>
             <td>{key}</td>
-            <td>{val}</td>
+            <td>{JSON.stringify(val)}</td>
           </tr>
         ))}
       </tbody>
@@ -43,7 +43,7 @@ const prepareChartData = (sample) => {
     if (key.endsWith('_feature')) {
       let words = key.split('_')
       let date = new Date(Number.parseInt(words[words.length - 2])).getTime()
-      curve_data[date] = val
+      curve_data[date] = val === 99999 ? null : val
     }
   })
 
@@ -128,8 +128,8 @@ export default function SamplePanel() {
   }, [sampleState.classProperty])
 
   return (
-    <div className="sidebar h-100 d-flex flex-column">
-      
+    <div className="h-100 d-flex flex-column">
+
       <div className="sample-container px-2 pt-2">
         <SampleContainer />
       </div>
@@ -138,6 +138,10 @@ export default function SamplePanel() {
         <Card className="h-100 w-100">
           <Card.Body className="p-2">
           {chartData ?
+            <Fragment>
+              <div className="d-flex justify-content-end">
+                <Button size="sm"><ArrowsFullscreen /></Button>
+              </div>
             <Chart 
               width="100%" 
               height="90%" 
@@ -155,40 +159,18 @@ export default function SamplePanel() {
                 legend: {
                   position: 'bottom'
                 },
+                pointSize: 3,
               }}
               rootProps={{ 'data-testid': '1' }}
+              legendToggle
+              
             />
+            </Fragment>
             :
             "Click on an sample to see its phenology"
           }
           </Card.Body>
         </Card>
-        {/* <div className="chart-canvas w-100 h-100 p-2">
-        {chartData ?
-          <Chart 
-            width="100%" 
-            height="90%" 
-            chartType="LineChart" 
-            loader={<div>Loading Chart...</div>} 
-            data={chartData}
-            options={{
-              hAxis: {
-                title: 'Date',
-                format: "yyyy-MM-dd"
-              },
-              vAxis: {
-                title: 'Value',
-              },
-              legend: {
-                position: 'bottom'
-              },
-            }}
-            rootProps={{ 'data-testid': '1' }}
-          />
-          :
-          "Click on an sample to see its phenology"
-        }
-        </div> */}
       </div>
     </div>
   );
@@ -245,7 +227,9 @@ export const SampleContainer = () => {
 
       // if (geojson.features[0].geometry.type !== "Point") {
       // }
-
+      if (geojsonLayer) {
+        map.removeLayer(geojsonLayer)
+      }
       // create geojson layer
       let layer = L.geoJSON(geojson, {
         pointToLayer: (geoJsonPoint, latlng) => {

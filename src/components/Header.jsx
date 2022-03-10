@@ -3,7 +3,7 @@ import { BrowserRouter, Link, NavLink, Route, Switch } from 'react-router-dom'
 
 export default () => {
   return (
-    <Navbar className="header" bg="dark" variant="dark" expand="lg" fixed="top">
+    <Navbar bg="dark" variant="dark" expand="lg" className='header' fixed='top'>
       <Container fluid>
         <Navbar.Brand href="/">Crop Mapping Explorer</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

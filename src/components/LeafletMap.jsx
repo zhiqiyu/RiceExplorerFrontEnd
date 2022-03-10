@@ -15,9 +15,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "react-bootstrap";
 import { useContext } from "react";
 import { BASEMAPS } from "../utils/constants";
-import { toggle } from "../features/phenology/editingSlice";
+import { toggle } from "../features/editingSlice";
 
-import { idField } from "./panels/SamplePanel"
+import { idField } from "../panels/SamplePanel"
 
 import L from "leaflet";
 
@@ -206,18 +206,6 @@ const InfoControl = (props) => {
     </div>
   );
 };
-
-const ChartControl = (props) => {
-  const { render } = props;
-
-  return (
-    <div className="leaflet-bottom leaflet-left">
-      <div className="leaflet-control leaflet-bar chart-board">
-        {typeof render === 'function' && render()}
-      </div>
-    </div>
-  );
-}
 
 
 

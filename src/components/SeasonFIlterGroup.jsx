@@ -3,7 +3,7 @@ import { Card, Col, Form, Row } from "react-bootstrap";
 
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "../features/phenology/seasonSlice";
+import { actions } from "../features/seasonSlice";
 
 import _ from "lodash"
 

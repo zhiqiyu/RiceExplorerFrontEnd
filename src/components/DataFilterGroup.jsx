@@ -3,7 +3,7 @@ import { Card, Col, Form, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 
 import { dataList, featureList, districtList } from "../utils/constants";
-import { update, changeDataSource } from "../features/phenology/datasetSlice";
+import { update, changeDataSource } from "../features/datasetSlice";
 
 export function SatelliteDataFilters(props) {
   // const ctx = useContext(EmpiricalFormContext);
