@@ -72,7 +72,7 @@ export const panToLatLng = ([lat, lng]) => {
 
 
 export function Map(props) {
-  const { info } = props;
+  // const { info } = props;
 
   const appName = useSelector(state => state.appName)
 
@@ -163,7 +163,7 @@ export function Map(props) {
 
       {/* {showEditControl ? <EditingControl /> : null} */}
 
-      {appName !== "phenology" ? <InfoControl info={info} /> : null}
+      {appName !== "phenology" ? <InfoControl /> : null}
     </MapContainer>
   );
 }
@@ -197,11 +197,14 @@ const EditingControl = (props) => {
 };
 
 const InfoControl = (props) => {
-  const { info } = props;
+  // const { info } = props;
+
+  const appStatus = useSelector(state => state.appStatus)
+
   return (
     <div className="leaflet-bottom leaflet-left">
       <div className="leaflet-control leaflet-bar info-board">
-        {parse(info)}
+        {parse(appStatus.info)}
       </div>
     </div>
   );

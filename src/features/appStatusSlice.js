@@ -8,12 +8,22 @@ export const APP_STATUS = {
 
 export const appStatusSlice = createSlice({
   name: "appStatus",
-  initialState: APP_STATUS.ready,
+  initialState: {
+    status: APP_STATUS.ready,
+    info: "Please run the app to show area of rice."
+  },
   reducers: {
-    setStatus: (state, action) => action.payload
+    setStatus: (state, action) => {
+      state.status = action.payload
+      return state
+    },
+    setInfo: (state, action) => {
+      state.info = action.payload
+      return state
+    }
   }
 })
 
-export const { setStatus } = appStatusSlice.actions
+export const { setStatus, setInfo } = appStatusSlice.actions
 
 export default appStatusSlice.reducer

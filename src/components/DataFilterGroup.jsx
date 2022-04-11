@@ -197,7 +197,7 @@ export const AuxDataFilters = (props) => {
         </h6>
       </Card.Header>
       <Card.Body>
-      <Form.Group
+        <Form.Group
           as={Row}
           controlId={"dataset_boundary"}
           className="mb-2 align-items-center"
@@ -247,20 +247,43 @@ export const AuxDataFilters = (props) => {
 
         <Form.Group
           as={Row}
-          controlId={"dataset_cropmask"}
-          className="mb-2 align-items-center"
+          controlId={"use_cropmask"}
+          className="align-items-center"
         >
           <Form.Label column xs={4}>
-            Crop Mask (GEE asset)
+            Crop Mask 
           </Form.Label>
           <Col xs={8}>
-            <Form.Control
-              type={"text"}
-              onChange={(e) => handleChange("crop_mask", e.target.value)}
-              value={datasetFilters["crop_mask"]}
+            <Form.Check 
+              type="checkbox" 
+              label="" 
+              checked={datasetFilters["use_crop_mask"]}
+              onChange={(e) => handleChange("use_crop_mask", e.target.checked)}
             />
           </Col>
+
         </Form.Group>
+        
+        {datasetFilters["use_crop_mask"] ? (
+          <Form.Group
+            as={Row}
+            controlId={"dataset_cropmask"}
+            className="mb-2 align-items-center"
+          >
+            <Form.Label column xs={4}>
+              (GEE asset)
+            </Form.Label>
+            <Col xs={8}>
+              <Form.Control
+                type={"text"}
+                onChange={(e) => handleChange("crop_mask", e.target.value)}
+                value={datasetFilters["crop_mask"]}
+              />
+            </Col>
+          </Form.Group>
+        ) : null
+        }
+        
       </Card.Body>
     </Card>
   )

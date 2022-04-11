@@ -9,6 +9,8 @@ import { map, layerControlRef, addTileOverlays, removeAllOverlays } from "../com
 import { SatelliteDataFilters, AuxDataFilters } from "../components/DataFilterGroup";
 import { SeasonFilterGroup } from "../components/SeasonFilterGroup";
 
+import {setInfo} from "../features/appStatusSlice"
+
 const tabNames = {
   tab1: "Datasets",
   tab2: "Seasons"
@@ -16,10 +18,11 @@ const tabNames = {
 
 export const FilterPanel = (props) => {
 
-  const { setInfo } = props;
+  // const { setInfo } = props;
 
   // state from redux store
   const csrfToken = useSelector(state => state.csrfToken)
+  const appStatus = useSelector(state => state.appStatus)
   const datasetFilters = useSelector(state => state.dataset)
   const seasonFilters = useSelector(state => state.seasons)
   const editing = useSelector(state => state.editing)
@@ -90,7 +93,7 @@ export const FilterPanel = (props) => {
         overlays.push(overlay)
 
         if (res_body[key].area) {
-          setInfo("Rice area: <b>" + res_body[key].area.toFixed(3) + " ha</b>\n")
+          dispatch(setInfo("Rice area: <b>" + res_body[key].area.toFixed(3) + " ha</b>\n"))
         }
       })
       addTileOverlays(overlays)

@@ -11,9 +11,7 @@ export const SeasonFilterGroup = (props) => {
   const { name, inputThres, readOnly } = props;
 
   // use state and actions from redux
-  const appName = useSelector(state => state.appName)
   const seasonFilter = useSelector(state => state.seasons[name])
-  const sampleState = useSelector(state => state.samples)
   const dispatch = useDispatch()
   const action = actions[name]
 

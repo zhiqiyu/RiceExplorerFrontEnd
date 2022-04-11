@@ -34,7 +34,7 @@ function App() {
 
   const appName = useSelector(state => state.appName)
 
-  const [info, setInfo] = useState("Please run the app to show area of rice.");
+  // const [info, setInfo] = useState("Please run the app to show area of rice.");
 
   useEffect(() => {
     let token = getCookie("csrftoken");
@@ -69,13 +69,13 @@ function App() {
               <div className="h-100 w-100">
                 <Switch>
                   <Route exact path="/empirical">
-                    <FilterPanel setInfo={setInfo} />
+                    <FilterPanel  />
                   </Route>
                   <Route exact path="/phenology">
                     <SettingsPanel />
                   </Route>
                   <Route exact path="/classification">
-                    <ClassificationPanel setInfo={setInfo} />
+                    <ClassificationPanel  />
                   </Route>
                 </Switch>
               </div>
@@ -83,12 +83,12 @@ function App() {
               <SplitPane 
                 split="vertical" 
                 primary="second" 
-                defaultSize={appName === "phenology" ? "20%" : 0}
+                defaultSize={appName === "phenology" ? "25%" : 0}
                 minSize={0}
-                maxSize={appName === "phenology" ? "35%" : 0}
+                maxSize={appName === "phenology" ? "40%" : 0}
               >
                 <div className="h-100 w-100">
-                  <MapPanel info={info} />
+                  <MapPanel />
                 </div>
 
                 <div className="h-100">
