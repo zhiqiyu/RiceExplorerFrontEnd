@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Form, TabContainer, Row, Col, Nav, TabContent, TabPane, Button, Spinner, Dropdown, DropdownButton } from "react-bootstrap"
 import { useSelector, useDispatch } from "react-redux"
-import { seasonNames } from '../utils/constants'
 import axios from "axios";
 import _ from "lodash";
 import L from 'leaflet'
@@ -54,7 +53,7 @@ export const FilterPanel = (props) => {
     const formData = new FormData()
 
     let jsonData = {}
-    seasonNames.forEach(name => {
+    Object.keys(seasonFilters).forEach(name => {
       if (seasonFilters[name]['on']) {
         jsonData[name] = _.cloneDeep(seasonFilters[name])
         delete jsonData[name].on
@@ -128,7 +127,7 @@ export const FilterPanel = (props) => {
     <div className="sidebar h-100 flex-column">
       <Form method="POST" onSubmit={handleSubmit} noValidate validated={validated}>
         <TabContainer defaultActiveKey={tabNames.tab1} unmountOnExit={false}>
-          <Row className="tabs-nav g-0 flex-wrap">
+          <Row className="bg-white g-0 flex-wrap">
             <Nav variant="pills" className="h-100">
               <Col className="h-100 align-items-center p-1">
                 <Nav.Link className="tab-title align-middle w-100 h-100 h6 mb-0" eventKey={tabNames.tab1} >{tabNames.tab1}</Nav.Link>
@@ -150,7 +149,7 @@ export const FilterPanel = (props) => {
                 </TabPane>
                 <TabPane eventKey={tabNames.tab2}>
                   
-                  {seasonNames.map(name => (
+                  {Object.keys(seasonFilters).map(name => (
                     <SeasonFilterGroup name={name} key={name} inputThres={true} readOnly={loading} />
                   ))}
 

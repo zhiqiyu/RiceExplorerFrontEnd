@@ -1,6 +1,5 @@
 import { Button, Col, Form, Nav, Row, Spinner, TabContainer, TabContent, TabPane } from "react-bootstrap";
 import { SatelliteDataFilters, AuxDataFilters } from "../components/DataFilterGroup";
-import { seasonNames } from '../utils/constants'
 import { SeasonFilterGroup } from "../components/SeasonFilterGroup";
 import { useState } from "react";
 import axios from "axios";
@@ -190,7 +189,7 @@ export default function SettingsPanel(props) {
 
                 <TabPane eventKey={tabNames.tab2} >
 
-                  {seasonNames.map(name => (
+                  {Object.keys(seasonFilters).map(name => (
                     <SeasonFilterGroup key={name} name={name} inputThres={false} readOnly={editing} />
                   ))}
 

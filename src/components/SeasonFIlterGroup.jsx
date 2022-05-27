@@ -1,58 +1,94 @@
-import React from "react";
-import { Card, Col, Form, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import { Button, Card, Col, Form, Row, ToggleButton } from "react-bootstrap";
 
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "../features/seasonSlice";
+import { addSeason, deleteSeason, modifySeason, changeSeasonName } from "../features/seasonSlice";
 
 import _ from "lodash"
+import { PencilSquare } from "react-bootstrap-icons";
 
 export const SeasonFilterGroup = (props) => {
-  const { name, inputThres, readOnly } = props;
-
+  const { idx, inputThres, readOnly } = props;
+  
   // use state and actions from redux
-  const seasonFilter = useSelector(state => state.seasons[name])
+  const seasonFilter = useSelector(state => state.seasons.seasons[idx])
   const dispatch = useDispatch()
-  const action = actions[name]
+  // const action = actions[name]
 
-  // update thresholds after each re-render
-  // useEffect(() => {
-  //   if (!seasonFilter.on) {
-  //     handleChange("min", null);
-  //     handleChange("max", null);
-  //     return;
-  //   }
-  //   // pre-check if all inputs are valid
-  //   if (sampleState.geojson.features.length === 0) return;
-  //   if (Date.parse(seasonFilter.start))
-  // })
+  const [name, setName] = useState(seasonFilter.name)
+  const [editing, setEditing] = useState(false)
 
   const handleChange = (field, value) => {
-    dispatch(action({[field]: value}))
+    dispatch(modifySeason({
+      name: seasonFilter.name, 
+      [field]: value
+    }))
+  }
+
+  const handleDeleteSeason = (e) => {
+    dispatch(deleteSeason(seasonFilter.name))
+  }
+
+  const handleClickEdit = (e) => {
+    if (editing) {
+      // if it is currently in editing mode, clicking button again would 
+      // confirm editing and save the edited name
+      dispatch(changeSeasonName({
+        oldName: seasonFilter.name, 
+        newName: name,
+      }))
+    }
+    setEditing(!editing)
+  }
+
+  const handleEditingName = (e) => {
+    setName(e.target.value)
   }
 
   return (
     <Card className="mb-2 border-secondary">
       <Row className="align-items-center gx-2 m-0 card-header">
         <Col xs="auto">
-          <Form.Check
-            type="switch"
-            id={`${name}_switch`}
-            aria-label={name}
-            checked={seasonFilter.on}
-            onChange={(e) => handleChange("on", e.target.checked)}
-          />
+          
+          <ToggleButton 
+            size="sm" 
+            type="checkbox"
+            checked={editing}
+            variant="outline-secondary" 
+            onClick={handleClickEdit}
+          >
+            <PencilSquare />
+          </ToggleButton>
+        </Col>
+        <Col >
+          {editing ? 
+            <Form.Control
+              plaintext={!editing}
+              readOnly={!editing}
+              onChange={handleEditingName}
+              defaultValue={name}
+            /> :
+            <h6 className={"mb-0"}>{name}</h6>
+          }
         </Col>
         <Col xs="auto">
-          <h6 className="m-0">{name.charAt(0).toUpperCase() + name.slice(1)}</h6>
+          <Button size="sm" variant="danger" onClick={handleDeleteSeason}>
+            X
+          </Button>
         </Col>
       </Row>
-      <fieldset id={`${name}_fields`} disabled={!seasonFilter.on}>
+      {/* <div className="position-absolute end-0">
+          <Button size="sm">
+            X
+          </Button>
+        </div> */}
+      <fieldset id={`${seasonFilter.name}_fields`}>
         <Card.Body>
           <Form.Group
             as={Row}
             className="mb-2"
-            controlId={`${name}_start_fields`}
+            controlId={`${seasonFilter.name}_start_fields`}
           >
             <Form.Label column sm={4}>
               Start date <span style={{color: "red"}}>*</span>
@@ -61,8 +97,7 @@ export const SeasonFilterGroup = (props) => {
               <Form.Control
                 type="date"
                 required
-                readOnly={readOnly}
-                name={`${name}_start`}
+                name={`${seasonFilter.name}_start`}
                 value={seasonFilter.start}
                 onChange={(e) => handleChange("start", e.target.value)}
               />
@@ -71,7 +106,7 @@ export const SeasonFilterGroup = (props) => {
           <Form.Group
             as={Row}
             className="mb-2"
-            controlId={`${name}_end_fields`}
+            controlId={`${seasonFilter.name}_end_fields`}
           >
             <Form.Label column sm={4}>
               End date <span style={{color: "red"}}>*</span>
@@ -80,8 +115,7 @@ export const SeasonFilterGroup = (props) => {
               <Form.Control
                 type="date"
                 required
-                readOnly={readOnly}
-                name={`${name}_end`}
+                name={`${seasonFilter.name}_end`}
                 value={seasonFilter.end}
                 onChange={(e) => handleChange("end", e.target.value)}
               />
@@ -103,10 +137,10 @@ export const SeasonFilterGroup = (props) => {
                     type="number"
                     required={inputThres}
                     readOnly={!inputThres || readOnly}
-                    id={`${name}_min`}
+                    id={`${seasonFilter.name}_min`}
                     placeholder="min"
                     step="0.01"
-                    name={`${name}_min`}
+                    name={`${seasonFilter.name}_min`}
                     value={seasonFilter.min}
                     onChange={(e) => handleChange("min", e.target.value)}
                   />
@@ -117,10 +151,10 @@ export const SeasonFilterGroup = (props) => {
                     type="number"
                     required={inputThres}
                     readOnly={!inputThres || readOnly}
-                    id={`${name}_max`}
+                    id={`${seasonFilter.name}_max`}
                     placeholder="max"
                     step="0.01"
-                    name={`${name}_max`}
+                    name={`${seasonFilter.name}_max`}
                     value={seasonFilter.max}
                     onChange={(e) => handleChange("max", e.target.value)}
                   />

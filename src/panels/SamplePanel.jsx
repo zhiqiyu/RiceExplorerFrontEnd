@@ -1,6 +1,6 @@
 import { Fragment, useContext, useState } from "react";
 import ReactDOMServer from "react-dom/server";
-import { Button, ButtonGroup, Card, Col, Container, Form, ListGroup, Row, Table } from "react-bootstrap";
+import { Button, ButtonGroup, Card, Col, Container, Form, ListGroup, Modal, Row, Table } from "react-bootstrap";
 import shp from "shpjs";
 import L from "leaflet";
 import { map, layerControlRef, addTileOverlays, panToLatLng, geojsonLayer, setGeojsonLayer, addGeoJsonOverlay } from "../components/LeafletMap";
@@ -75,6 +75,9 @@ export default function SamplePanel() {
   // const [positiveValueState, setPositiveValueState] = useState(null);
 
   const sampleState = useSelector((state) => state.samples);
+
+  const [chartModalShow, setChartModalShow] = useState(false);
+
   const dispatch = useDispatch();
 
   // console.log(sampleState.geojson)
@@ -127,6 +130,10 @@ export default function SamplePanel() {
 
   }, [sampleState.classProperty])
 
+
+  const handleClose = () => setChartModalShow(false)
+  const handleShow = () => setChartModalShow(true)
+
   return (
     <div className="h-100 d-flex flex-column">
 
@@ -138,10 +145,10 @@ export default function SamplePanel() {
         <Card className="h-100 w-100">
           <Card.Body className="p-2">
           {chartData ?
-            <Fragment>
-              <div className="d-flex justify-content-end">
-                <Button size="sm"><ArrowsFullscreen /></Button>
-              </div>
+          <Fragment>
+            <div className="d-flex justify-content-end mb-1">
+              <Button size="sm" onClick={handleShow}><ArrowsFullscreen /></Button>
+            </div>
             <Chart 
               width="100%" 
               height="90%" 
@@ -165,13 +172,52 @@ export default function SamplePanel() {
               legendToggle
               
             />
-            </Fragment>
+          </Fragment>
             :
             "Click on an sample to see its phenology"
           }
           </Card.Body>
         </Card>
       </div>
+
+      <Modal 
+        fullscreen
+        show={chartModalShow} 
+        onHide={handleClose}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Phenology Chart</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {chartData ?
+            <Chart 
+              width="100%" 
+              height="100%" 
+              chartType="LineChart" 
+              loader={<div>Loading Chart...</div>} 
+              data={chartData}
+              options={{
+                hAxis: {
+                  title: 'Date',
+                  format: "yyyy-MM-dd"
+                },
+                vAxis: {
+                  title: 'Value',
+                },
+                legend: {
+                  position: 'bottom'
+                },
+                pointSize: 3,
+              }}
+              rootProps={{ 'data-testid': '1' }}
+              legendToggle
+              
+            />
+            :
+            "Click on an sample to see its phenology"
+          }
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }
@@ -366,6 +412,8 @@ export const SampleContainer = () => {
             ))}
         </ListGroup>
       </Card.Body>
+
+
     </Card>
   )
 
