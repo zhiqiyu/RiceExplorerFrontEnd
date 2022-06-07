@@ -54,25 +54,6 @@ export const MapCarousel = (props) => {
   const [smallMapObjs, setSmallMapObjs] = useState({})
 
 
-  // load false color basemaps for small maps
-  // useEffect(() => {
-  //   // TODO: change year to reflect the true year
-  //   let year = 2019 
-  //   axios.get("phenology/monthly_composite", {
-  //     baseURL: process.env.PUBLIC_URL,
-  //     params: {
-  //       year: year,
-  //     }
-  //   }).then(res => {
-  //     let body = res.data
-  //     Object.keys(smallMapObjs).forEach(month => {
-  //       const url = body[month]
-  //       let layer = new L.TileLayer(url)
-  //       layer.addTo(smallMapObjs[month])
-  //     })
-  //   })
-  // }, [])
-
   // move 
   useEffect(() => {
     if (sampleSlice.selected) {

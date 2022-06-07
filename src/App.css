@@ -40,7 +40,7 @@ code {
 }
 
 .main {
-  padding-top: calc(var(--header-height) + var(--app-status-bar-height));
+  padding-top: calc(var(--header-height) );
 }
 
 .panel-separator {

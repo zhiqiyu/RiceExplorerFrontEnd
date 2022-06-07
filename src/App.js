@@ -15,10 +15,10 @@ import { useEffect, useState } from "react";
 import { getCookie } from "./utils/csrfToken";
 import { setToken } from "./features/csrfTokenSlice";
 import ClassificationApp from "./pages/ClassificationApp";
-import { FilterPanel } from "./panels/FilterPanel";
+
 import AppStatusBar from "./components/AppStatusBar";
 import Map from "./components/LeafletMap";
-import { ClassificationPanel } from "./panels/ClassificationPanel";
+
 import SamplePanel from "./panels/SamplePanel";
 import MapPanel from "./panels/MapPanel";
 import { APP_NAME, setAppName } from "./features/appNameSlice";
@@ -29,6 +29,9 @@ import PhenologyRight from "./apps/phenology/PhenologyRight";
 import PhenologyLeft from "./apps/phenology/PhenologyLeft";
 import { EmpiricalLeft } from "./apps/empirical/EmpiricalLeft";
 import EmpiricalRight from "./apps/empirical/EmpiricalRight";
+import { ClassificationLeft } from "./apps/classification/ClassificationLeft";
+import { ClassificationRight } from "./apps/classification/ClassificationRight";
+import { MapCarousel } from "./components/MapCarousel";
 
 const leftSize = {
   "default": "20%",
@@ -64,7 +67,6 @@ function App() {
   return (
     <div className="vh-100 vw-100">
       <Header />
-      <AppStatusBar />
       <div className="main d-flex h-100 w-100">
         <Switch>
           <Route exact path="/">
@@ -72,6 +74,7 @@ function App() {
           </Route>
 
           <Route path={["/empirical", "/phenology", "/classification"]}>
+
             <SplitPane
               split="vertical"
               defaultSize={leftSize["default"]}
@@ -79,6 +82,7 @@ function App() {
               maxSize={leftSize["max"]}
               className="h-100 position-static"
             >
+              {/* left panel */}
               <div className="h-100 w-100">
                 <Switch>
                   <Route exact path="/empirical">
@@ -88,7 +92,7 @@ function App() {
                     <PhenologyLeft />
                   </Route>
                   <Route exact path="/classification">
-                    <ClassificationPanel  />
+                    <ClassificationLeft  />
                   </Route>
                 </Switch>
               </div>
@@ -100,10 +104,28 @@ function App() {
                 minSize={0}
                 maxSize={rightSize["max"]}
               >
+                {/* Mid panel */}
                 <div className="h-100 w-100">
-                  <MapPanel />
+                  {/* <MapPanel /> */}
+                  <SplitPane 
+                    split="horizontal" 
+                    primary="second" 
+                    defaultSize={appName === "phenology" ? 250 : 0} 
+                    maxSize={appName === "phenology" ? 400 : 0}
+                    minSize={0}
+                  >
+                    <div className="w-100 h-100">
+                      <Map />
+                    </div>
+
+                    <div className="w-100">
+                      {appName === "phenology" ? (<MapCarousel />) : null}
+                    </div>
+
+                  </SplitPane>
                 </div>
 
+                {/* Right panel */}
                 <div className="h-100">
                   <Route exact path="/phenology">
                     <div className="h-100 w-100">
@@ -114,7 +136,7 @@ function App() {
                     <EmpiricalRight />
                   </Route>
                   <Route exact path="/classification">
-                    {/* <ClassificationPanel  /> */}
+                    <ClassificationRight />
                   </Route>
                 </div>
               </SplitPane>
