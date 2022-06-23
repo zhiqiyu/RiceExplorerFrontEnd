@@ -6,11 +6,12 @@ import { useSelector } from "react-redux";
 import { BASEMAPS } from "../utils/constants";
 import _, { sample } from "lodash"
 
-import { idField } from "../panels/SamplePanel"
+
 import { addTileOverlays } from "./LeafletMap";
 import L from "leaflet"
 import { useDispatch } from "react-redux";
 import { changePhenologyDate } from "../features/sampleSlice";
+import { idField } from "./SampleContainer";
 
 // let smallMapObjs = {
   

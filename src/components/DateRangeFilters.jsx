@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 import { BASEMAPS } from "../utils/constants";
 import _, { sample } from "lodash"
 
-import { idField } from "../panels/SamplePanel"
 import { addTileOverlays } from "./LeafletMap";
 import L from "leaflet"
 import { useDispatch } from "react-redux";
@@ -40,7 +39,7 @@ export const DateRangeFilters = () => {
     <div className="w-100 ">
       <Card className="w-100 mb-2 border-secondary">
         <Card.Header>
-          <h6 className="mb-0">Date Range</h6>
+          <h6 className="mb-0">Phenology Date Range</h6>
         </Card.Header>
         <Card.Body >
           <Form.Group

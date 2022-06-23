@@ -1,19 +1,5 @@
-import { Fragment, useContext, useState } from "react";
-import ReactDOMServer from "react-dom/server";
 import { Button, ButtonGroup, Card, Col, Container, Form, ListGroup, Modal, Nav, Row, Stack, TabContainer, TabContent, Table, TabPane } from "react-bootstrap";
-import shp from "shpjs";
-import L from "leaflet";
-import { map, layerControlRef, addTileOverlays, panToLatLng, geojsonLayer, setGeojsonLayer, addGeoJsonOverlay } from "../../components/LeafletMap";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  replace,
-  addFeatures,
-  selectFeature,
-  setClassProperty,
-  deleteFeature
-} from "../../features/sampleSlice";
-import { useEffect } from "react";
-import Chart from "react-google-charts";
 import _, { sample } from 'lodash'
 import { ArrowsFullscreen, FileEarmarkArrowUpFill, SaveFill, TrashFill, Upload } from "react-bootstrap-icons";
 import { saveAs } from 'file-saver'
@@ -22,7 +8,6 @@ import * as d3 from "d3"
 import { actions, modifySeason } from "../../features/seasonSlice"
 import { SampleContainer, idField } from "../../components/SampleContainer";
 import { ChartArea, ChartContainer } from "../../components/ChartContainer";
-import SeasonPanel from "../../panels/SeasonPanel";
 
 const tabNames = {
   tab1: "Samples",

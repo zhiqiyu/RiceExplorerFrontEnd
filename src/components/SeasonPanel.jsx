@@ -48,7 +48,7 @@ export const SeasonPanel = () => {
       <div className="mb-2">
         <Button variant="secondary" className="w-100" onClick={handleAddSeason}>
           <PlusSquare /> {" "}
-          Add Season
+          Add phenology phase
         </Button>
       </div>
       

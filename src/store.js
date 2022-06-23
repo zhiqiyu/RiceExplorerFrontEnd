@@ -7,6 +7,7 @@ import editingReducer from "./features/editingSlice";
 import appStatusReducer from "./features/appStatusSlice";
 import appNameReducer from "./features/appNameSlice";
 import classificationReducer from "./features/classificationSlice";
+import logReducer from "./features/logSlice";
 
 export default configureStore({
     reducer: {
@@ -18,5 +19,6 @@ export default configureStore({
         appStatus: appStatusReducer,
         appName: appNameReducer,
         classification: classificationReducer,
+        log: logReducer,
     }
 })

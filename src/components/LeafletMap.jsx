@@ -17,11 +17,11 @@ import { useContext } from "react";
 import { BASEMAPS } from "../utils/constants";
 import { toggle } from "../features/editingSlice";
 
-import { idField } from "../panels/SamplePanel"
 
 import L from "leaflet";
 
 import parse from 'html-react-parser'
+import { idField } from "./SampleContainer";
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -163,52 +163,25 @@ export function Map(props) {
 
       {/* {showEditControl ? <EditingControl /> : null} */}
 
-      {appName !== "phenology" ? <InfoControl /> : null}
+      {/* {appName !== "phenology" ? <InfoControl /> : null} */}
     </MapContainer>
   );
 }
 
-const EditingControl = (props) => {
-  const editing = useSelector((state) => state.editing);
-  const dispatch = useDispatch();
 
-  const handleChangeEditing = (e) => {
-    dispatch(toggle());
-  };
+// const InfoControl = (props) => {
+//   // const { info } = props;
 
-  const displayControl = useMemo(
-    () => (
-      <Button
-        variant={editing ? "warning" : "light"}
-        size="sm"
-        onClick={handleChangeEditing}
-      >
-        Start Editing
-      </Button>
-    ),
-    [editing]
-  );
+//   const appStatus = useSelector(state => state.appStatus)
 
-  return (
-    <div className="leaflet-top start-50 top-0">
-      <div className="leaflet-control leaflet-bar">{displayControl}</div>
-    </div>
-  );
-};
-
-const InfoControl = (props) => {
-  // const { info } = props;
-
-  const appStatus = useSelector(state => state.appStatus)
-
-  return (
-    <div className="leaflet-bottom leaflet-left">
-      <div className="leaflet-control leaflet-bar info-board">
-        {parse(appStatus.info)}
-      </div>
-    </div>
-  );
-};
+//   return (
+//     <div className="leaflet-bottom leaflet-left">
+//       <div className="leaflet-control leaflet-bar info-board">
+//         {parse(appStatus.info)}
+//       </div>
+//     </div>
+//   );
+// };
 
 
 

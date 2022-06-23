@@ -1,26 +1,20 @@
-import { Container, Nav, Navbar, Row } from "react-bootstrap";
 import {
-  BrowserRouter,
-  NavLink,
   Route,
   Switch,
   useLocation,
 } from "react-router-dom";
 import Header from "./components/Header";
-import Home from "./pages/Home";
-// import EmpiricalApp from "./pages/EmpiricalApp";
-// import PhenologyApp from "./pages/PhenologyApp";
+import Home from "./components/Home";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getCookie } from "./utils/csrfToken";
 import { setToken } from "./features/csrfTokenSlice";
-import ClassificationApp from "./pages/ClassificationApp";
 
 import AppStatusBar from "./components/AppStatusBar";
 import Map from "./components/LeafletMap";
 
-import SamplePanel from "./panels/SamplePanel";
-import MapPanel from "./panels/MapPanel";
+
 import { APP_NAME, setAppName } from "./features/appNameSlice";
 
 import "./App.css";
@@ -32,6 +26,7 @@ import EmpiricalRight from "./apps/empirical/EmpiricalRight";
 import { ClassificationLeft } from "./apps/classification/ClassificationLeft";
 import { ClassificationRight } from "./apps/classification/ClassificationRight";
 import { MapCarousel } from "./components/MapCarousel";
+import { LogPanel } from "./components/LogPanel";
 
 const leftSize = {
   "default": "20%",
@@ -110,8 +105,8 @@ function App() {
                   <SplitPane 
                     split="horizontal" 
                     primary="second" 
-                    defaultSize={appName === "phenology" ? 250 : 0} 
-                    maxSize={appName === "phenology" ? 400 : 0}
+                    defaultSize={250} 
+                    maxSize={400}
                     minSize={0}
                   >
                     <div className="w-100 h-100">
@@ -119,7 +114,7 @@ function App() {
                     </div>
 
                     <div className="w-100">
-                      {appName === "phenology" ? (<MapCarousel />) : null}
+                      {appName === "phenology" ? (<MapCarousel />) : <LogPanel />}
                     </div>
 
                   </SplitPane>
