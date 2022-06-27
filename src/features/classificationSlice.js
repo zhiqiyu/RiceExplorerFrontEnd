@@ -34,8 +34,6 @@ export const MODEL_SPECS = {
       description: "The randomization seed."
     }
   },
-  "Gradient Tree Boost": {
-  }
 }
 
 const initialState = {

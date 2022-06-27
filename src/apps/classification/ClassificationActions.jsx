@@ -79,6 +79,8 @@ export const ClassificationActions = () => {
       }
       overlays.push(overlay)
 
+      setDownLoadUrl(res_body[key].download_url)
+
       let message = ""
 
       if (res_body.area) {
@@ -87,6 +89,8 @@ export const ClassificationActions = () => {
       
       if (res_body.confusion_matrix) {
         let parsed = JSON.parse(res_body.confusion_matrix)
+        let oa = res_body.oa
+        let kappa = res_body.kappa
         message += 
         `Confusion matrix:
         <div>
@@ -112,6 +116,9 @@ export const ClassificationActions = () => {
           </tbody>
           </table>
           </div>
+
+          <p>Overall Accuracy: <b>${oa}</b></p>
+          <p>Kappa: <b>${kappa}</b></p>
           `
       }
 

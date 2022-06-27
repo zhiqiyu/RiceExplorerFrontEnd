@@ -10,11 +10,23 @@ import * as d3 from "d3"
 import { layerControlRef } from "../../components/LeafletMap";
 import { replace, setResult } from "../../features/sampleSlice";
 import { useEffect } from "react";
-import { actions } from "../../features/seasonSlice"
+import { actions, modifySeason } from "../../features/seasonSlice"
 import DateRangeFilters from "../../components/DateRangeFilters";
 
 import { appendLog } from "../../features/logSlice";
 import { idField } from "../../components/SampleContainer";
+
+
+const removeOutliers = (arr) => {
+  let first = d3.quantile(arr, 0.25)
+  let third = d3.quantile(arr, 0.75)
+  let interquatile = third - first
+  let upperbound = third + interquatile * 1.5
+  let lowerbound = first - interquatile * 1.5
+  return arr.filter(element => element > lowerbound && element < upperbound)
+}
+
+
 
 export const PhenologyActions = () => {
 
@@ -22,7 +34,6 @@ export const PhenologyActions = () => {
   const datasetFilters = useSelector(state => state.dataset)
   const seasonFilters = useSelector(state => state.seasons)
   const sampleState = useSelector(state => state.samples)
-  const editing = useSelector(state => state.editing)
   const dispatch = useDispatch()
 
   const [loading, setLoading] = useState(false)
@@ -92,7 +103,56 @@ export const PhenologyActions = () => {
     // set loading state
     setLoading(true)
 
+  }
 
+
+  const handleRefresh = (e) => {
+    if (sampleState.geojson.features.length === 0) {
+      alert("Please upload the ground truth samples first.")
+      return;
+    }
+
+    seasonFilters.seasons.forEach(seasonFilter => { 
+      // let seasonFilter = seasonFilters[season];
+      
+      let start_date = new Date(seasonFilter.start)
+      let end_date = new Date(seasonFilter.end)
+
+      let candidates = []
+
+      sampleState.geojson.features.forEach(sample => {
+        // let candidates = []
+        if (sample.properties[sampleState.classProperty.name] !== sampleState.classProperty.positiveValue) {
+          return;
+        }
+        Object.entries(sample.properties).forEach(([key, val]) => {
+          if (key.endsWith('_feature')) {
+            let words = key.split('_')
+            let date = new Date(Number.parseInt(words[words.length - 2])).getTime()
+            if (start_date.getTime() <= date && date <= end_date.getTime()) {
+              candidates.push(val)
+            }
+          }
+        })
+      })
+
+      if (candidates.length === 0) {
+        return;
+      } 
+
+      // compute mean, std
+      let filteredCandidates = removeOutliers(candidates)
+      let mean = _.sum(filteredCandidates) / filteredCandidates.length;
+      let std = Math.sqrt(_.sum(_.map(filteredCandidates, v => Math.pow(v - mean, 2))) / filteredCandidates.length);
+      
+      // let action = actions[season];
+      dispatch(modifySeason({
+        "name": seasonFilter.name,
+        "min": (mean - std).toFixed(2), 
+        "max": (mean + std).toFixed(2)
+      }))
+      
+    })
   }
   
   return (
@@ -103,18 +163,25 @@ export const PhenologyActions = () => {
         onClick={handleSubmit}
         variant={ loading ? "secondary" : "primary"} 
         disabled={loading}
-        style={{"width": "100px"}}
+        style={{"width": "150px"}}
       >
         {loading 
           ? ( 
-            <div className="d-flex align-items-center">
+            <div className="d-flex align-items-center justify-content-center">
               <Spinner as="span" animation="border" size="sm" role="status" ></Spinner>
               <div>Running </div>
             </div> 
             ) 
           : 
-          "Save settings"
+          "Get Phenology"
         }
+      </Button>
+
+      <Button
+        size="sm"
+        onClick={handleRefresh}
+      >
+        Calculate Thresholds
       </Button>
     </Stack>
   )
