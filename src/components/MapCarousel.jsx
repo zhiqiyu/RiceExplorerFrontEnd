@@ -6,11 +6,12 @@ import { useSelector } from "react-redux";
 import { BASEMAPS } from "../utils/constants";
 import _, { sample } from "lodash"
 
-import { idField } from "../panels/SamplePanel"
+
 import { addTileOverlays } from "./LeafletMap";
 import L from "leaflet"
 import { useDispatch } from "react-redux";
 import { changePhenologyDate } from "../features/sampleSlice";
+import { idField } from "./SampleContainer";
 
 // let smallMapObjs = {
   
@@ -53,25 +54,6 @@ export const MapCarousel = (props) => {
 
   const [smallMapObjs, setSmallMapObjs] = useState({})
 
-
-  // load false color basemaps for small maps
-  // useEffect(() => {
-  //   // TODO: change year to reflect the true year
-  //   let year = 2019 
-  //   axios.get("phenology/monthly_composite", {
-  //     baseURL: process.env.PUBLIC_URL,
-  //     params: {
-  //       year: year,
-  //     }
-  //   }).then(res => {
-  //     let body = res.data
-  //     Object.keys(smallMapObjs).forEach(month => {
-  //       const url = body[month]
-  //       let layer = new L.TileLayer(url)
-  //       layer.addTo(smallMapObjs[month])
-  //     })
-  //   })
-  // }, [])
 
   // move 
   useEffect(() => {

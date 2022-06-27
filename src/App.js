@@ -1,31 +1,42 @@
-import { Container, Nav, Navbar, Row } from "react-bootstrap";
 import {
-  BrowserRouter,
-  NavLink,
   Route,
   Switch,
   useLocation,
 } from "react-router-dom";
 import Header from "./components/Header";
-import Home from "./pages/Home";
-import EmpiricalApp from "./pages/EmpiricalApp";
-import PhenologyApp from "./pages/PhenologyApp";
+import Home from "./components/Home";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getCookie } from "./utils/csrfToken";
 import { setToken } from "./features/csrfTokenSlice";
-import ClassificationApp from "./pages/ClassificationApp";
-import { FilterPanel } from "./panels/FilterPanel";
+
 import AppStatusBar from "./components/AppStatusBar";
 import Map from "./components/LeafletMap";
-import SettingsPanel from "./panels/SettingsPanel";
-import { ClassificationPanel } from "./panels/ClassificationPanel";
-import SamplePanel from "./panels/SamplePanel";
-import MapPanel from "./panels/MapPanel";
+
+
 import { APP_NAME, setAppName } from "./features/appNameSlice";
 
 import "./App.css";
 import SplitPane from "react-split-pane";
+import PhenologyRight from "./apps/phenology/PhenologyRight";
+import PhenologyLeft from "./apps/phenology/PhenologyLeft";
+import { EmpiricalLeft } from "./apps/empirical/EmpiricalLeft";
+import EmpiricalRight from "./apps/empirical/EmpiricalRight";
+import { ClassificationLeft } from "./apps/classification/ClassificationLeft";
+import { ClassificationRight } from "./apps/classification/ClassificationRight";
+import { MapCarousel } from "./components/MapCarousel";
+import { LogPanel } from "./components/LogPanel";
+
+const leftSize = {
+  "default": "20%",
+  "max": "40%"
+}
+
+const rightSize = {
+  "default": "25%",
+  "max": "40%"
+}
 
 function App() {
   const location = useLocation();
@@ -34,7 +45,7 @@ function App() {
 
   const appName = useSelector(state => state.appName)
 
-  const [info, setInfo] = useState("Please run the app to show area of rice.");
+  // const [info, setInfo] = useState("Please run the app to show area of rice.");
 
   useEffect(() => {
     let token = getCookie("csrftoken");
@@ -51,7 +62,6 @@ function App() {
   return (
     <div className="vh-100 vw-100">
       <Header />
-      <AppStatusBar />
       <div className="main d-flex h-100 w-100">
         <Switch>
           <Route exact path="/">
@@ -59,23 +69,25 @@ function App() {
           </Route>
 
           <Route path={["/empirical", "/phenology", "/classification"]}>
+
             <SplitPane
               split="vertical"
-              defaultSize={"20%"}
+              defaultSize={leftSize["default"]}
               minSize={0}
-              maxSize={"35%"}
+              maxSize={leftSize["max"]}
               className="h-100 position-static"
             >
+              {/* left panel */}
               <div className="h-100 w-100">
                 <Switch>
                   <Route exact path="/empirical">
-                    <FilterPanel setInfo={setInfo} />
+                    <EmpiricalLeft  />
                   </Route>
                   <Route exact path="/phenology">
-                    <SettingsPanel />
+                    <PhenologyLeft />
                   </Route>
                   <Route exact path="/classification">
-                    <ClassificationPanel setInfo={setInfo} />
+                    <ClassificationLeft  />
                   </Route>
                 </Switch>
               </div>
@@ -83,19 +95,43 @@ function App() {
               <SplitPane 
                 split="vertical" 
                 primary="second" 
-                defaultSize={appName === "phenology" ? "20%" : 0}
+                defaultSize={rightSize["default"]}
                 minSize={0}
-                maxSize={appName === "phenology" ? "35%" : 0}
+                maxSize={rightSize["max"]}
               >
+                {/* Mid panel */}
                 <div className="h-100 w-100">
-                  <MapPanel info={info} />
+                  {/* <MapPanel /> */}
+                  <SplitPane 
+                    split="horizontal" 
+                    primary="second" 
+                    defaultSize={250} 
+                    maxSize={400}
+                    minSize={0}
+                  >
+                    <div className="w-100 h-100">
+                      <Map />
+                    </div>
+
+                    <div className="w-100">
+                      {appName === "phenology" ? (<MapCarousel />) : <LogPanel />}
+                    </div>
+
+                  </SplitPane>
                 </div>
 
+                {/* Right panel */}
                 <div className="h-100">
                   <Route exact path="/phenology">
                     <div className="h-100 w-100">
-                      <SamplePanel />
+                      <PhenologyRight />
                     </div>
+                  </Route>
+                  <Route exact path="/empirical">
+                    <EmpiricalRight />
+                  </Route>
+                  <Route exact path="/classification">
+                    <ClassificationRight />
                   </Route>
                 </div>
               </SplitPane>

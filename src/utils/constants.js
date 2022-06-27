@@ -1,5 +1,3 @@
-export const seasonNames = ["sowing", "peak", "harvesting"]
-
 export const districtList = {
   "upload": "Upload boundary file (shp)",
   "MORANG": "MORANG",
@@ -31,8 +29,8 @@ export const dataList = {
       "Sentinel-1 SAR GRD: C-band Synthetic Aperture Radar Ground Range Detected, log scaling",
   },
   optical: {
-    "MODIS/006/MOD13Q1":
-      "MOD13Q1.006 Terra Vegetation Indices 16-Day Global 250m",
+    // "MODIS/006/MOD13Q1":
+    //   "MOD13Q1.006 Terra Vegetation Indices 16-Day Global 250m",
     "LANDSAT/LT05/C01/T1_TOA":
       "USGS Landsat 5 TM Collection 1 Tier 1 TOA Reflectance",
     "LANDSAT/LT05/C01/T1_SR": "USGS Landsat 5 Surface Reflectance Tier 1",

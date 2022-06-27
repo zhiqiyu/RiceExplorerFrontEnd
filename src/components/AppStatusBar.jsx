@@ -13,7 +13,7 @@ export function AppStatusBar(props) {
       className="app-status-bar align-items-center justify-content-center d-flex w-100"
     >
       <div>
-        <h6 className="mb-0">App Status: <b>{status}</b></h6>
+        <h6 className="mb-0">App Status: <b>{status.status}</b></h6>
       </div>
     </div>
   )

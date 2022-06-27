@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export const APP_NAME = {
-  "home": "home",
+  home: "home",
   empirical: "empirical",
   phenology: "phenology",
   classification: "classification"

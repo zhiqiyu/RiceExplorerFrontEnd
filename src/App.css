@@ -4,6 +4,7 @@
   --tabs-nav-height: 40px;
   --map-carousel-height: 250px;
   --app-status-bar-height: 30px;
+  --chart-height: 300px;
 }
 
 html {
@@ -39,34 +40,8 @@ code {
 }
 
 .main {
-  padding-top: calc(var(--header-height) + var(--app-status-bar-height));
+  padding-top: calc(var(--header-height) );
 }
-
-/* split panel */
-/* .app-main {
-  padding-top: var(--app-status-bar-height);
-} */
-
-/* .left-panel {
-  flex-grow: 0;
-  flex-shrink: 0;
-  flex-basis: var(--left-panel-width);
-  width: var(--left-panel-width);
-}
-
-.mid-panel {
-  flex-grow: 1;
-  flex-shrink: 1;
-  /* flex-basis: calc(100% - var(--left-panel-width)); */
-  /* max-width: calc(100% - var(--left-panel-width)); */
-  /* width: var(--left-panel-width);
-} */
-
-/* .right-panel {
-  flex-grow: 0;
-  flex-shrink: 0;
-  width: var(--left-panel-width);
-}  */
 
 .panel-separator {
   cursor: col-resize;
@@ -134,31 +109,20 @@ code {
   /* padding: auto; */
 }
 
-.tabs-content {
-  /* height: calc(100vh - var(--header-height) - var(--tabs-nav-height) - var(--app-status-bar-height)); */
-  overflow-y: auto;
-}
 
 .sample-container {
-  /* height: calc(
-    75vh - var(--header-height) - var(--tabs-nav-height) -
-      var(--app-status-bar-height)
-  ); */
-  height: 70%;
-  flex: 1;
+  padding-bottom: calc(var(--chart-height) + 0.5em);
 }
 
-.sample-container .card-body {
-  overflow-y: auto;
-}
 
 .sample-list {
   font-size: medium;
 }
 
 .chart-canvas {
-  height: 300px;
-  /* flex: 0 0 20%; */
+  height: var(--chart-height);
+  position: absolute;
+  bottom: 0.5em;
 }
 
 .popup {
