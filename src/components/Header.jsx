@@ -1,4 +1,5 @@
 import { Button, Container, Nav, Navbar, NavDropdown, Stack } from 'react-bootstrap';
+import { BoxArrowUpRight } from 'react-bootstrap-icons';
 import { useSelector } from 'react-redux';
 import { NavLink, Route, Switch } from 'react-router-dom'
 import { ClassificationActions } from '../apps/classification/ClassificationActions';
@@ -31,6 +32,12 @@ export default () => {
               </NavDropdown.Item>
             </NavDropdown>
             
+            <Nav.Link href={process.env.PUBLIC_URL + '/user-manual.html'} target="_blank">
+              <div className="d-flex align-items-center">
+                <div className="pe-1">User Manual</div>
+                <BoxArrowUpRight />
+              </div>
+            </Nav.Link>
           </Nav>
 
           <Stack direction="horizontal" gap={2}>

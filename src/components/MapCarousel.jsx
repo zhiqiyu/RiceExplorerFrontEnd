@@ -99,6 +99,11 @@ export const MapCarousel = (props) => {
     <div className="map-carousel h-100 d-flex overflow-auto">
       <div className="ps-2 py-2 pe-1" style={{width:280, flexShrink: 0}}>
         <Card className="w-100 h-100">
+          <Card.Header>
+            <h6 className="m-0 p-0">
+              Phenology Date Range
+              </h6>
+          </Card.Header>
           <Card.Body className="p-2">
             <Form.Group
               as={Row}
